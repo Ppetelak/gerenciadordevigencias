@@ -86,7 +86,9 @@ function atualizarValores() {
         })
             .then((response) => {
                 if (response.ok) {
-                    alert('Valores atualizados com sucesso!');
+                    showMessage(response.message)
+                    location.reload();
+                    //alert('Valores atualizados com sucesso!');
                 } else {
                     alert('Erro ao atualizar valores. Por favor, tente novamente.');
                 }
@@ -96,7 +98,7 @@ function atualizarValores() {
                 alert('Erro ao enviar os dados. Por favor, tente novamente.');
             });
     } else {
-        alert("Preencha todos os campos antes de prosseguir.");
+        showMessageError('Existem campos vazios, preencha todos e tente novamente')
     }
 }
 
@@ -115,3 +117,53 @@ document.addEventListener('DOMContentLoaded', () => {
     updateBtn.addEventListener('click', atualizarValores);
     excluirCampoVigencia();
 });
+
+// Verifica se o cookie de deleteMessage existe
+if (document.cookie.includes('alertSucess')) {
+    // Obtém o valor do cookie
+    const alertSucess = getCookieValue('alertSucess');
+
+    // Renderiza a mensagem na tela
+    showMessage(alertSucess);
+
+    // Remove o cookie
+    document.cookie = 'alertSucess=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+}
+
+if (document.cookie.includes('alertError')) {
+    // Obtém o valor do cookie
+    const alertError = getCookieValue('alertError');
+
+    // Renderiza a mensagem na tela
+    showMessageError(alertError);
+
+    // Remove o cookie
+    document.cookie = 'alertError=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+}
+
+// Função para obter o valor de um cookie pelo seu nome
+function getCookieValue(name) {
+    const cookieName = `${name}=`;
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i].trim();
+        if (cookie.startsWith(cookieName)) {
+            return cookie.substring(cookieName.length, cookie.length);
+        }
+    }
+    return '';
+}
+
+function showMessage(message) {
+    const Mensagem = document.getElementById('Message')
+    Mensagem.innerHTML = `${decodeURIComponent(message)} 
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>`
+    Mensagem.style.display = 'block';
+}
+
+function showMessageError(message) {
+    const Mensagem = document.getElementById('MessageError')
+    Mensagem.innerHTML = `ALERTA: ${decodeURIComponent(message)} 
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>`
+    Mensagem.style.display = 'block';
+}

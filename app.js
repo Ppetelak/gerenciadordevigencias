@@ -65,6 +65,7 @@ const db = mysql.createConnection({
     user: 'midiaIdeal',
     password: 'midia@8444',
     database: 'vigencias_db',
+	  port: '3306'
 });
   
 db.connect((error) => {
@@ -259,6 +260,7 @@ app.post('/update-vigencias', (req, res) => {
             }
 
             // Transação bem-sucedida
+            res.cookie('alertSucess', 'Vigências atualizadas com sucesso!', { maxAge: 3000 });
             res.status(200).json({ message: 'Valores atualizados com sucesso' });
           });
         });
@@ -476,8 +478,6 @@ app.post('/salvarLogo', (req, res) => {
 
 /* Inicializando o servidor */
 
-app.listen(port, () => {
-  console.log(`Servidor iniciado na porta ${port}`);
-});
+app.listen(process.env.PORT || 3000);
 
 

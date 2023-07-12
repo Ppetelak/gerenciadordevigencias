@@ -398,7 +398,6 @@ function confirmarExclusaoOperadora() {
     }
 }
 
-
 // Verifica se o cookie de deleteMessage existe
 if (document.cookie.includes('alertSucess')) {
     // Obtém o valor do cookie
@@ -448,4 +447,5 @@ function showMessageError(message) {
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>`
     Mensagem.style.display = 'block';
 }
+
 
