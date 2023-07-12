@@ -90,11 +90,6 @@ app.get('/logout', (req, res) => {
 });
 
 /* rotas públicas */
-  
-
-app.get('/', (req, res ) => {
-    res.send('Olá Mundo');
-})
 
 app.get('/login', (req, res) => {
     const filePath = path.join(__dirname, 'src/index.html');
@@ -272,47 +267,6 @@ app.post('/update-vigencias', (req, res) => {
   });
 });
 
-/* app.post('/operadoras-update', (req, res) => {
-  const { id, nome, administradora, abrangencia, areaAtuacao } = req.body;
-
-  // Iniciar uma transação
-  db.beginTransaction((err) => {
-    if (err) {
-      console.error('Erro ao iniciar a transação:', err);
-      return res.status(500).json({ message: 'Erro interno do servidor' });
-    }
-
-    const query = 'UPDATE operadoras SET nome = ?, administradora = ?, abrangencia = ?, areadeatuacao = ? WHERE id = ?';
-    db.query(query, [nome, administradora, abrangencia, areaAtuacao, id], (err, result) => {
-      if (err) {
-        console.error('Erro ao atualizar operadora:', err);
-
-        // Reverter a transação em caso de erro
-        db.rollback(() => {
-          console.error('Transação revertida.');
-          return res.status(500).json({ message: 'Erro interno do servidor' });
-        });
-      }
-
-      // Confirmar a transação
-      db.commit((err) => {
-        if (err) {
-          console.error('Erro ao confirmar a transação:', err);
-
-          // Reverter a transação em caso de erro
-          db.rollback(() => {
-            console.error('Transação revertida.');
-            return res.status(500).json({ message: 'Erro interno do servidor' });
-          });
-        }
-
-        // Transação bem-sucedida
-        res.status(200).json({ message: 'Operadora atualizada com sucesso' });
-      });
-    });
-  });
-}); */
-
 app.post('/operadoras-update', (req, res) => {
   const { id, nome, administradora, abrangencia, areaAtuacao } = req.body;
 
@@ -428,7 +382,7 @@ app.post('/excluir-operadora', (req, res) => {
 
 /* rota pública */
 
-app.get('/calendario', (req, res) => {
+app.get('/', (req, res) => {
   const query = 'SELECT o.id, o.logo, o.abrangencia, o.areadeatuacao, o.nome, o.administradora, v.vigencia, v.fechamento FROM operadoras o LEFT JOIN vigencias v ON o.id = v.operadora_id';
   db.query(query, (err, resultados) => {
     if (err) {
@@ -486,9 +440,6 @@ app.get('/calendario', (req, res) => {
   });
 });
 
-app.get('/teste', (req, res) => {
-  res.render('teste');
-})
 
 app.post('/salvarLogo', (req, res) => {
   const logo = req.body.logoUrl
