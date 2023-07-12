@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="./img/faviconV2_mounthermon.png" type="image/png">
+  <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+  <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;800&display=swap" rel="stylesheet">
+
+
+
+  <title>Calendário de vigências</title>
+
+  <link rel="stylesheet" href="./css/calendario.css">
+  <link href="https://fonts.googleapis.com/css2?family=Karla:wght@200;300;500&family=Montserrat&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <header class="elemento-a-ocultar">
+    <h1>Calendário de vendas</h1>
+    <h2>Fique atento, vamos dar um gás nas vendas!</h2>
+    <form>
+      <ul class="tabs">
+        <li onclick="changeTab(0)" class="active" id="tabMounthermon">Mount Hermon</li>
+        <li onclick="changeTab(1)" id="tabCompar">Compar</li>
+        <li onclick="changeTab(2)" id="tabClasse">Classe Administradora</li>
+        <input type="checkbox" id="checkboxTodos"> <label>Marcar todos </label><br>
+      </ul>
+      <div class="tab-content active" id="tabMounthermon">
+        <div class="operadoras" id="mounthermon">
+          <% for (let i=0; i < operadoras.length; i++) { %>
+            <% if ( operadoras[i].administradora==='Mount Hermon' ) { %>
+              <div class="checkbox-card">
+                <input type="checkbox" id="<%= operadoras[i].nome %>" name="operadoras[]"
+                  value="<%= operadoras[i].nome %>">
+                <label for="<%= operadoras[i].nome %>">
+                  <img src="<%= operadoras[i].logo %>">
+                </label>
+              </div>
+              <% } %>
+                <% } %>
+        </div>
+      </div>
+      <div class="tab-content" id="tabCompar">
+        <div class="operadoras" id="compar">
+          <% for (let i=0; i < operadoras.length; i++) { %>
+            <% if ( operadoras[i].administradora==='Compar' ) { %>
+              <div class="checkbox-card">
+                <input type="checkbox" id="<%= operadoras[i].nome %>" name="operadoras[]"
+                  value="<%= operadoras[i].nome %>">
+                <label for="<%= operadoras[i].nome %>">
+                  <img src="<%= operadoras[i].logo %>">
+                </label>
+              </div>
+              <% } %>
+                <% } %>
+        </div>
+      </div>
+      <div class="tab-content" id="tabClasse">
+        <div class="operadoras" id="classe">
+          <% for (let i=0; i < operadoras.length; i++) { %>
+            <% if ( operadoras[i].administradora==='Classe Administradora' ) { %>
+              <div class="checkbox-card">
+                <input type="checkbox" id="<%= operadoras[i].nome %>" name="operadoras[]"
+                  value="<%= operadoras[i].nome %>">
+                <label for="<%= operadoras[i].nome %>">
+                  <img src="<%= operadoras[i].logo %>">
+                </label>
+              </div>
+              <% } %>
+                <% } %>
+        </div>
+      </div>
+      <div class="buttonadd">
+        <button id="add">
+          atualizar tabela de vigências
+        </button>
+      </div>
+    </form>
+  </header>
+  <main>
+    <div class="inicio">
+      <div class="cabecalho">
+        <div class="col-1">
+          <img src="./img-privadas/icone_calendario.png">
+        </div>
+        <div class="col-2">
+          <h1>
+            Calendário de </br>
+            <span>Vigências</span>
+          </h1>
+        </div>
+      </div>
+      <p> Fique atento, vamos dar um gás nas vendas</p>
+      </br>
+      <p> Data última atualização: <%= informacoesGerais.data_atualizacao.toLocaleDateString('pt-BR') %>
+      </p>
+      <p> Data próxima atualização: <%= informacoesGerais.data_proxima_atualizacao.toLocaleDateString('pt-BR') %>
+      </p>
+    </div>
+    <div class="div-degrade"> </div>
+    <div class="impressao" id="tabelaVigencias">
+      <table class="table">
+        <thead id="custom-thead">
+          <tr>
+            <th scope="col" class="col-1 h4"><strong>Operadora</strong></th>
+            <th scope="col" class="col-4 h4"><strong>Abrangência</strong></th>
+            <th scope="col" class="col-3 h4"><strong>Vigência/Fechamento</strong></th>
+            <th scope="col" class="col-4 h4"><strong>Área de Atuação</strong></th> 
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let i=0; i < operadoras.length; i++) { %>
+            <tr scope="row" class="operadora-table table" data-operadora="<%= operadoras[i].nome %>"
+              data-administradora="<%= operadoras[i].administradora %>" data-id="<%= operadoras[i].id %>">
+              <td scope="col" class="col-1">
+                <img class="img-fluid rounded" src="<%= operadoras[i].logo %>">
+              </td>
+              <td class="col-4">
+                <%= operadoras[i].abrangencia %>
+              </td>
+              <td class="col-3">
+                <% for (let j=0; j < operadoras[i].vigencias.length; j++) { %>
+                  <table class="table table-bordered">
+                    <tr class="my-2">
+                      <td class="px-2">
+                        <%= operadoras[i].vigencias[j] %>
+                      </td>
+                      <td class="px-2">
+                        <%= operadoras[i].fechamentos[j] %>
+                      </td>
+                    </tr>
+                  </table>
+                  <% } %>
+              </td>
+              <td class="col-4">
+                <%= operadoras[i].areaAtuacao %> <!-- Alterado para exibir a "Área de Atuação" -->
+              </td>
+            </tr>
+            <% } %>
+        </tbody>
+      </table>
+    </div>
+    <div class="administradorasfooter">
+      <div class="tablefooter">
+        <div id="logoMounthermon">
+          <img src="./img-privadas/logomounthermonoriginal.png" width="130px">
+        </div>
+        <div id="logoCompar">
+          <img src="./img-privadas/logocomparoriginal.png" width="130px">
+        </div>
+        <div id="logoClasse">
+          <img src="./img-privadas/classeadministradoraoriginal.png" width="130px">
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="footerImpresso">
+    </div>
+
+  </main>
+  <footer class="elemento-a-ocultar">
+    <div class="footer centralizar">
+      <button id="btnGerarPdf">
+        gerar pdf
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-check-2">
+          <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" />
+          <polyline points="14 2 14 8 20 8" />
+          <path d="m3 15 2 2 4-4" />
+        </svg>
+      </button>
+    </div>
+    <div class="dicasdeuso centralizar">
+      <h1>DICAS DE USO</h1> </br>
+      <p>1 - Selecione a Operadora navegando entre as abas</p>
+      <p>2 - Selecione as operadoras cujo as quais gostaria de visualizar e gerar suas respectivas informações</p>
+      <p>3 - Clique em atualizar tabela de vigências</p>
+      <p>4 - Visualize o modelo da tabela logo abaixo, verifique as informações</p>
+      <p>5 - Clique em gerar pdf
+      <p>6 - Em seguida na tela que se abrir do navegador selecione a "impressora" de nome " Salvar como PDF"</p>
+    </div>
+    <div class="copy centralizar"> Gerador de Vigências - Linha Master 2023, desenvolvido por Mídia Ideal</div>
+    <script src="./js/calendario.js"></script>
+  </footer>
+</body>
+
+</html>

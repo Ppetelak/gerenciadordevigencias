@@ -1,0 +1,2 @@
+INSERT INTO vigencias (operadora_id, vigencia, fechamento, entidade) VALUES (8, '2023-07-01', '2023-07-15', 'Entidade X');
+INSERT INTO vigencias (operadora_id, vigencia, fechamento, entidade) VALUES (2, '2023-08-01', '2023-08-15', 'Entidade Y');

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alteração Vigências/Fechamentos</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;800&display=swap" rel="stylesheet">  
+    <script src="/js/jquery.ui.datepicker-pt-BR.js"></script>
+</head>
+
+<body>
+    <div class="navbardiv"> 
+        <%- include('navbar') %>
+    </div>
+    <div class="alert alert-success alert-dismissible fade show fixed-top" role="alert" id="Message" style="display:none">
+        Sucesso!
+      </div>
+      <div class="alert alert-danger alert-dismissible fade show fixed-top" role="alert" id="MessageError" style="display:none">
+        Erro!
+      </div>
+        <div class="content">
+            <h1>Operadoras</h1>
+            <table class="table">
+                <thead class="sticky-top custom-thead">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Logo</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Administradora</th>
+                        <th scope="col">Abrangência</th>
+                        <th scope="col">Área de Atuação</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="tbody-operadoras">
+                    <% for (let i=0; i < operadoras.length; i++) { %>
+                        <tr data-id="<%= operadoras[i].id %>" id="operadora-<%= operadoras[i].id %>">
+                            <th scope="row"><%= i+1 %></th>
+                            <td class="td-1"><img src="<%= operadoras[i].logo %>" class="editable-image"><button class="edit-image-btn btn btn-info" style="display: none;" title="Editar logo da Operadora"><i class="bi bi-images"></i></button>
+                            </td>
+                            <td class="td-2"><span class="nome-operadora input" data-field="nome">
+                                    <%= operadoras[i].nome %>
+                                </span></td>
+                            <td class="td-3"><span class="nome-adm select" data-field="administradora">
+                                    <%= operadoras[i].administradora %>
+                                </span></td>
+                            <td class="td-4"><span class="abrangencia textarea" data-field="abrangencia">
+                                    <%= operadoras[i].abrangencia %>
+                                </span></td>
+                            <td class="td-5"><span class="areadeatuacao textarea" data-field="areaAtuacao">
+                                    <%= operadoras[i].areadeatuacao %>
+                                </span></td>
+                            <td>
+                                <button class="edit-btn btn btn-primary"><i class="bi bi-pencil-square" title="Editar informações da operadora"></i></button>
+                                
+                                <button class="cancel-btn btn btn-danger" style="display: none;" title="Voltar sem salvar"><i class="bi bi-arrow-counterclockwise"></i></button>
+                                <!-- Botão para editar a imagem -->
+                                <button class="save-btn btn btn-success" style="display: none;" title="Salvar alterações"><i class="bi bi-sd-card"></i></button>
+                            </td>
+                        </tr>
+                        <% } %>
+                </tbody>
+            </table>
+            <div>
+                <button class="btn btn-primary" id="adicionar-operadora"> <i class="bi bi-plus-circle"></i> Adicionar nova operadora</button>
+                <button class="btn btn-danger" id="excluir-operadora" href="#exclusao"><i class="bi bi-trash2"></i> Excluir operadora</button>
+            </div>
+            <div id="exclusao" class="container" style="display:none">
+                <h4>Atenção você está na área de exclusão de Operadora</h4>
+                <div class="row">
+                    <div class="col-sm">
+                        <p class="font-weight-bold">Selecione a operadora</p>
+                        <select id="operadoraSelect" class="form-select">
+                            <% for (let i = 0; i < operadoras.length; i++) { %>
+                                <option value="<%= operadoras[i].id %>"><%= operadoras[i].nome %> (<%= operadoras[i].administradora %>)
+                                </option>
+                              <% } %>
+                        </select>
+                    </div>
+                    <div class="col-sm">
+                        <label for="password">Senha para exclusão:</label>
+                        <input type="password" class="form-control" id="password" placeholder="Digite sua senha" name="password">                      
+                    </div>
+                    <div class="col-sm">
+                        <label for="password">Clique e confirme</label>
+                        <button class="btn btn-danger" id="confirmar-exclusao"> Confirmar Exclusão</button>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+        </div>
+        <!-- Modal de Upload -->
+        <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content" id="modalContent">
+                    <input type="hidden" id="selectedOperadoraId">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="uploadModalLabel">Imagens</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h3>Imagens existentes:</h3>
+                        <div class="existing-images d-flex flex-wrap">
+                            <% files.forEach(file=> { %>
+                                <div class="image-item">
+                                  <img src="/img/<%= file %>" alt="Imagem" class="existing-image">
+                                </div>
+                              <% }) %>
+                        </div>
+
+                        <form id="uploadForm" enctype="multipart/form-data">
+                            <input type="file" name="file" class="form-control" required>
+                            <br>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-cloud-upload-fill" title="Enviar nova Logo"></i>Enviar nova Logo</button>
+                        </form>
+
+                        <button class="btn btn-danger" id="deleteBtn" style="display: none;" title="Excluir Imagem Selecionada"><i class="bi bi-trash3"></i>Excluir Imagem Selecionada</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Fechar">Fechar</button>
+                        <button type="button" class="btn btn-primary salvar-img-operadora" id="salvar-img-operadora" title="Salvar nova Logo no banco de dados"><i class="bi bi-sd-card"></i>Salvar Nova Logo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="/js/operadoras.js"></script>
+</body>
+
+</html>

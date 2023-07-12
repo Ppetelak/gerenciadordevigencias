@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./img/faviconV2_mounthermon.png" type="image/png">
+    
+    
+    <title>Calendário de vigências</title>
+
+    <link rel="stylesheet" href="./css/calendario.css">
+    <link href="https://fonts.googleapis.com/css2?family=Karla:wght@200;300;500&family=Montserrat&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('navbar') %>
+    <div class="content">
+      <header class="elemento-a-ocultar">
+          <h1>Visualização geral</h1>
+          <h2>Fique atento, vamos dar um gás nas vendas!</h2>
+      </header>
+      <main>
+        <div class="inicio">
+          <div class="cabecalho">
+            <div class="col-1">
+              <img src="./img-privadas/icone_calendario.png">
+            </div>
+            <div class="col-2">
+              <h1>
+                Calendário de </br>
+                <span>Vigências</span>
+              </h1>
+            </div>  
+          </div>
+          <p> Fique atento, vamos dar um gás nas vendas</p>
+          </br>
+          <p> Data última atualização: <%= informacoesGerais.data_atualizacao.toLocaleDateString('pt-BR') %></p>
+          <p> Data próxima atualização: <%= informacoesGerais.data_proxima_atualizacao.toLocaleDateString('pt-BR') %></p>
+        </div>
+        <div class="div-degrade"> </div>
+        <table class="titulotable">
+          <col operadora style="width: 20%;">
+          <col abrangencia style="width: 20%;">
+          <col vigenciafechamento style="width: 20%;"> 
+          <col areadeatuacao style="width: 40%;">
+          
+          
+          <tr>
+            <th rowspan="3" class="col-logo">Operadora</th>
+            <th rowspan="3" class="col-logo">Abrangência</th>
+            <th class="col-abr-vig">Vigência/Fechamento</th>
+            <th class="col-ent">Área de Atuação</th> <!-- Alterado para "Área de Atuação" -->
+          </tr>
+        </table>       
+          <div class="impressao" id="tabelaVigencias">
+            
+              <% for (let i=0; i < operadoras.length; i++) { %>
+                  <table class="operadora-table" data-operadora="<%= operadoras[i].nome %>" data-administradora="<%= operadoras[i].administradora %>"  data-id="<%= operadoras[i].id %>" style="width: 100%">
+                    <tr>
+                      <td class="col-logo" style="width: 20%;">
+                        <img src="<%= operadoras[i].logo %>">
+                      </td>
+                      <td class="col-abr" style="width: 20%;">
+                        <%= operadoras[i].abrangencia %>
+                      </td>
+                      <td class="col-vig-fechamento" style="width: 20%;">
+                        <% for (let j=0; j < operadoras[i].vigencias.length; j++) { %>
+                        <table>
+                              <tr>
+                                <td>
+                                    <%= operadoras[i].vigencias[j] %>
+                                </td>
+                                <td>
+                                  <%= operadoras[i].fechamentos[j] %>
+                                </td>
+                              </tr>
+                        </table>
+                        <% } %>
+                      </td>
+                      <td class="col-area" style="width: 40%;">
+                        <%= operadoras[i].areaAtuacao %> <!-- Alterado para exibir a "Área de Atuação" -->
+                      </td>
+                    </tr>
+                    <% } %>
+                  </table>          
+          </div>
+          <div class="administradorasfooter">
+            <div class="tablefooter">
+              <div id="logoMounthermon"> 
+                <img  src="./img-privadas/logomounthermonoriginal.png" width="130px">
+              </div>
+              <div id="logoCompar">
+                <img src="./img-privadas/logocomparoriginal.png" width="130px">
+              </div>
+              <div id="logoClasse"> 
+                <img src="./img-privadas/classeadministradoraoriginal.png" width="130px">
+              </div>
+            </div>
+          </div>
+        </div>
+      <div class="footerImpresso">
+      </div>
+          
+      </main>
+      <footer class="elemento-a-ocultar">
+        <div class="footer centralizar">
+          <button id="btnGerarPdf">
+              gerar pdf
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-check-2"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="m3 15 2 2 4-4"/></svg>
+          </button>
+        </div>
+        <div class="dicasdeuso centralizar">
+          <h1>DICAS DE USO</h1> </br> 
+          <p>1 - Selecione a Operadora navegando entre as abas</p>
+          <p>2 - Selecione as operadoras cujo as quais gostaria de visualizar e gerar suas respectivas informações</p>
+          <p>3 - Clique em atualizar tabela de vigências</p>
+          <p>4 - Visualize o modelo da tabela logo abaixo, verifique as informações</p>
+          <p>5 - Clique em gerar pdf
+          <p>6 - Em seguida na tela que se abrir do navegador selecione a "impressora" de nome " Salvar como PDF"</p>
+        </div>
+        <div class="copy centralizar"> Gerador de Vigências - Linha Master 2023, desenvolvido por Mídia Ideal</div>
+          <script src="./js/calendario.js"></script>
+      </footer>
+    </div>
+</body>
+</html>
