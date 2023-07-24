@@ -52,9 +52,9 @@ Entretando o uso da lógica e funcionalidade desde que não utilize a identidade
 
 ---
 
-##  TIME
+## 🤝 TIME
 
-Feito por [Pablo Petelak - Backend](https://pablopetelak.com) enquanto DEV da [Mídia Ideal](https://midiaideal.com.br) 
+Feito por [Pablo Petelak - Backend 👽](https://pablopetelak.com) enquanto DEV da [Mídia Ideal](https://midiaideal.com.br) 
 
-E [Maria Almeida - Front](https://github.com/mariak-fla) enquanto DEV da [Mídia Ideal](https://midiaideal.com.br)
+E [Maria Almeida - Front 🐀](https://github.com/mariak-fla) enquanto DEV da [Mídia Ideal](https://midiaideal.com.br)
 
