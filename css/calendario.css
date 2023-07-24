@@ -525,6 +525,13 @@ th, td {
     height: 10px;
 }
 
+.img-container {
+    max-width: 80%;
+    height: auto;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
 table .btn-abrir{
     background-color: var(--main-color);
     color: var(--gray-100);
