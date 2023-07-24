@@ -87,6 +87,7 @@ form {
 
 button, p, label, select, tbody td {
     font-family: var(--body-ff);
+    font-weight: 500;
 }
 
 button {
@@ -96,6 +97,7 @@ button {
 
 button, label {
     font-size: 1.5rem;
+    font-weight: bold;
     line-height: 2rem;
     text-transform: uppercase;
 }
@@ -103,6 +105,7 @@ button, label {
 p, select, td {
     font-size: 1.125rem;
     line-height: 1.75rem;
+    font-weight: 500;
 }
 
 select {
@@ -429,6 +432,7 @@ th {
 
 th, td {
     text-align: center;
+    font-weight: 500;
 }
 
 .vazio {
@@ -497,6 +501,7 @@ th, td {
     background-color: var(--gray-100);
     align-items: center;
     padding: 10px;
+    font-weight: 500;
 }
 .cabecalho h1 {
     font-size: 22px;

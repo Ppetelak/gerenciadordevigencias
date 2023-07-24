@@ -5,11 +5,11 @@ function adicionarCampoVigencia(event) {
     table.innerHTML = `
     <tr>
         <td>
-            <input type="text" class="vigencia-input form-control"
+            <input type="date" class="vigencia-input form-control"
                 value="">
         </td>
         <td>
-            <input type="text" class="fechamento-input form-control"
+            <input type="date" class="fechamento-input form-control"
                 value="">
         </td>
         <td>

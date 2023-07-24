@@ -9,6 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="./img/faviconV2_mounthermon.png" type="image/png">
   <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
   <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -112,9 +113,9 @@
         <thead id="custom-thead">
           <tr>
             <th scope="col" class="col-1 h4"><strong>Operadora</strong></th>
-            <th scope="col" class="col-4 h4"><strong>Abrangência</strong></th>
+            <th scope="col" class="col-4 h4"><strong>Região</strong></th>
             <th scope="col" class="col-3 h4"><strong>Vigência/Fechamento</strong></th>
-            <th scope="col" class="col-4 h4"><strong>Área de Atuação</strong></th> 
+            <th scope="col" class="col-4 h4"><strong>Manual</strong></th> 
           </tr>
         </thead>
         <tbody>
@@ -129,21 +130,45 @@
                 <%= operadoras[i].abrangencia %>
               </td>
               <td class="col-3">
-                <% for (let j=0; j < operadoras[i].vigencias.length; j++) { %>
+                <% for (let j = 0; j < operadoras[i].vigencias.length; j++) { %>
                   <table class="table table-bordered">
                     <tr class="my-2">
                       <td class="px-2">
-                        <%= operadoras[i].vigencias[j] %>
+                        <% // Check if the date data for vigencias is present before formatting and rendering %>
+                        <% if (operadoras[i].vigencias[j]) { %>
+                          <% // Convert the date string to a Date object for vigencias %>
+                          <% const vigenciaDate = new Date(operadoras[i].vigencias[j]); %>
+                          <% // Get the day, month, and year separately %>
+                          <% const vigenciaDay = String(vigenciaDate.getDate()).padStart(2, '0'); %>
+                          <% const vigenciaMonth = String(vigenciaDate.getMonth() + 1).padStart(2, '0'); %>
+                          <% const vigenciaYear = String(vigenciaDate.getFullYear()).slice(-2); %>
+                          <% // Create the formatted date string in the desired format for vigencias %>
+                          <%= `${vigenciaDay}-${vigenciaMonth}-${vigenciaYear}` %>
+                        <% } %>
                       </td>
                       <td class="px-2">
-                        <%= operadoras[i].fechamentos[j] %>
+                        <% // Check if the date data for fechamentos is present before formatting and rendering %>
+                        <% if (operadoras[i].fechamentos[j]) { %>
+                          <% // Convert the date string to a Date object for fechamentos %>
+                          <% const fechamentoDate = new Date(operadoras[i].fechamentos[j]); %>
+                          <% // Get the day, month, and year separately %>
+                          <% const fechamentoDay = String(fechamentoDate.getDate()).padStart(2, '0'); %>
+                          <% const fechamentoMonth = String(fechamentoDate.getMonth() + 1).padStart(2, '0'); %>
+                          <% const fechamentoYear = String(fechamentoDate.getFullYear()).slice(-2); %>
+                          <% // Create the formatted date string in the desired format for fechamentos %>
+                          <%= `${fechamentoDay}-${fechamentoMonth}-${fechamentoYear}` %>
+                        <% } %>
                       </td>
                     </tr>
                   </table>
-                  <% } %>
+                <% } %>
               </td>
+              
+              
+              
+              
               <td class="col-4">
-                <%= operadoras[i].areaAtuacao %> <!-- Alterado para exibir a "Área de Atuação" -->
+                <a href="<%= operadoras[i].areaAtuacao %>" target="_blank"><button class="btn btn-info"><i class="bi bi-download"></i> Abrir</button></a> <!-- Alterado para exibir a "Área de Atuação" -->
               </td>
             </tr>
             <% } %>
