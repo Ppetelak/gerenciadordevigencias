@@ -107,5 +107,6 @@ document.getElementById('btnGerarPdf').addEventListener('click', function () {
 
 function imprimirParteHTML() {
     window.print();
-    location.reload();
 }
+
+

@@ -1,10 +1,11 @@
 var operadoraId = 1;
 
-function enableEdit(row) {
+function enableEdit(row, AdmDefault) {
     row.find('.edit-btn').hide();
     row.find('.cancel-btn').show();
     row.find('.save-btn').show();
     row.find('.edit-image-btn').show();
+    console.log(AdmDefault);
 
     var linhaNome = row.find('.td-2');
     var spanNome = linhaNome.find('.nome-operadora');
@@ -25,14 +26,14 @@ function enableEdit(row) {
 
     var selectAdm = $('<select>', {
         'class': 'nome-adm select form-control',
-        'data-field': 'administradora'
+        'data-field': 'administradora',
     }).append(
         $('<option>', { value: 'Mount Hermon', text: 'Mount Hermon' }),
         $('<option>', { value: 'Classe Administradora', text: 'Classe Administradora' }),
         $('<option>', { value: 'Compar', text: 'Compar' })
     );
 
-    linhaAdm.empty().append(selectAdm);
+    linhaAdm.empty().append(selectAdm.val(AdmDefault));
 
     // Selecionar a opção correta no elemento select
     selectAdm.find('option').each(function () {
@@ -162,7 +163,8 @@ function updateOperadora(row) {
 // Evento de clique no botão de editar
 $(document).on('click', '.edit-btn', function () {
     const row = $(this).closest('tr');
-    enableEdit(row);
+    var AdmDefault = row.find('.td-3 .nome-adm').text().trim();
+    enableEdit(row, AdmDefault);
 });
 
 // Evento de clique do botão cancelar 

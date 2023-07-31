@@ -14,10 +14,10 @@
 
     --hue: 190;
 
-    --main-color: #20325D; 
-    --main-color-dark: #304246; 
+    --main-color: #20325D;
+    --main-color-dark: #304246;
     --main-color-light: #eb3d08;
-    
+
     --gray-800: #1F2937;
     --gray-700: #374151;
     --gray-500: #6B7280;
@@ -47,6 +47,7 @@
     background: var(--main-color);
     border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: var(--main-color-light);
 }
@@ -118,7 +119,7 @@ select {
     border-radius: 420rem;
     border: .75px solid var(--gray-400);
     color: var(--gray-500);
-    background: rgba(255,255,255,.9);
+    background: rgba(255, 255, 255, .9);
     padding: 0 1.5rem;
 
     background-image: url("data:image/svg+xml,%3Csvg width='8' height='4' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23278CCB' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
@@ -127,7 +128,7 @@ select {
 }
 
 select:focus {
-    border-color: rgba(0,0,0,0);
+    border-color: rgba(0, 0, 0, 0);
     outline: 2px solid var(--main-color)
 }
 
@@ -152,7 +153,7 @@ label {
     background-color: white;
     height: 10rem;
     width: min(27vw, 25rem);
-    
+
 }
 
 .checkbox-card.checked {
@@ -266,7 +267,7 @@ main {
 }
 
 .administradorasfooter {
-    position: relative; 
+    position: relative;
     height: 100px;
     background-color: var(--main-color);
     border: 1px solid var(--main-color-dark);
@@ -279,7 +280,7 @@ main {
 
 .tablefooter {
     position: absolute;
-    top: -20px; 
+    top: -20px;
     width: 80%;
     height: 70px;
     padding-top: 12px;
@@ -297,55 +298,57 @@ main {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 10px;
-  }
-  
-  .checkbox-card {
+}
+
+.checkbox-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-  
-  .checkbox-card input[type="checkbox"] {
+}
+
+.checkbox-card input[type="checkbox"] {
     position: absolute;
     opacity: 0;
     pointer-events: none;
-  }
-  
-  .checkbox-card label {
+}
+
+.checkbox-card label {
     display: block;
     position: relative;
     cursor: pointer;
-  }
-  
-  .checkbox-card img {
+}
+
+.checkbox-card img {
     width: 80%;
     height: auto;
     display: block;
     object-fit: contain;
-  }
-  
-  .checkbox-card input[type="checkbox"]:checked + label img {
+}
+
+.checkbox-card input[type="checkbox"]:checked+label img {
     opacity: 0.8;
     border-radius: 2px;
     border-color: var(--green);
     border-style: solid;
-    box-shadow: 0 0 2.5rem rgba(0,0,0,.1);
+    box-shadow: 0 0 2.5rem rgba(0, 0, 0, .1);
     border-radius: 1rem;
-  }
-  
-  .checkbox-card input[type="checkbox"]:focus + label img {
+}
+
+.checkbox-card input[type="checkbox"]:focus+label img {
     outline: 2px solid var(--main-color);
-  }
-  
+}
+
 th {
     font-family: var(--body-ff);
     font-size: 1.125rem
 }
 
 #custom-thead {
-    background-color: #343a40; /* Define a cor de fundo desejada */
-    color: #ffffff; /* Define a cor do texto como branco */
-  }
+    background-color: #343a40;
+    /* Define a cor de fundo desejada */
+    color: #ffffff;
+    /* Define a cor do texto como branco */
+}
 
 /* Estilos para as abas */
 .tabs {
@@ -359,7 +362,7 @@ th {
     color: var(--gray-100);
     margin-right: 10px;
     padding: 5px 10px;
-    background-color:#374151;
+    background-color: #374151;
     cursor: pointer;
     font-family: var(--body-ff);
     font-size: 16px;
@@ -377,7 +380,8 @@ th {
     padding: 10px;
     background-color: #ffffff;
     color: #fff;
-    border-radius: 12px;;
+    border-radius: 12px;
+    ;
 }
 
 .tab-content.active {
@@ -400,30 +404,32 @@ th {
     width: 100%
 }
 
-.itens tr th{
+.itens tr th {
     text-align: center;
 }
 
 .itens .col.abr-vig {
     width: 5%;
 }
- 
+
 .itens .col.logo {
     width: 30%;
 }
 
-.itens tr:first-child .image-wrapper{
-    width: 100%; /* Largura fixa da imagem */
-    height: 100px; /* Altura fixa da imagem */
+.itens tr:first-child .image-wrapper {
+    width: 100%;
+    /* Largura fixa da imagem */
+    height: 100px;
+    /* Altura fixa da imagem */
     overflow: hidden;
     align-items: center;
     text-align: center;
-} 
+}
 
-.itens tr:first-child .image-wrapper img{
+.itens tr:first-child .image-wrapper img {
     width: 100%;
-    height: 100%; 
-    object-fit: contain; 
+    height: 100%;
+    object-fit: contain;
 }
 
 .itens .col-ent {
@@ -452,6 +458,7 @@ th, td {
     width: 100%;
     text-align: center;
 }
+
 .copy {
     width: 100%;
     background-color: #191f20;
@@ -475,7 +482,7 @@ th, td {
     margin-bottom: 12px;
 }
 
-.dicasdeuso p{
+.dicasdeuso p {
     font-size: 14px;
 }
 
@@ -490,12 +497,13 @@ th, td {
     padding: 40px;
     background-color: #20325d;
 }
-  
-.col-1{
+
+.col-1 {
     width: 20%;
     z-index: 999;
 }
-.col-2{ 
+
+.col-2 {
     height: 90px;
     width: 80%;
     background-color: var(--gray-100);
@@ -503,9 +511,11 @@ th, td {
     padding: 10px;
     font-weight: 500;
 }
+
 .cabecalho h1 {
     font-size: 22px;
 }
+
 .cabecalho .col-2 span {
     font-variant: small-caps;
     font-size: 24px;
@@ -532,23 +542,136 @@ th, td {
     padding-bottom: 12px;
 }
 
-table .btn-abrir{
+.movimentacao{
+    display: none;
+}
+
+table .btn-abrir {
     background-color: var(--main-color);
     color: var(--gray-100);
     font-weight: 500;
 }
 
+@media screen and (max-width: 600px) {
+    body {
+        width: 100%
+    }
+
+    button#add {
+        width: 100%;
+        margin-top: 1rem;
+        background-color: var(--green);
+        border: 1px solid var(--gray-100);
+        border-radius: 420rem;
+        color: white;
+        padding: 15px;
+    }
+
+    .cabecalho {
+        display: contents;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin: auto;
+    }
+
+    .impressao {
+        overflow-x: auto;
+    }
+
+    .administradorasfooter {
+        flex-direction: column;
+        height: 40px;
+
+    }
+
+    .administradorasfooter img {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .tabs {
+        display: contents;
+        justify-content: space-between;
+        list-style: inside;
+        padding: 0;
+        margin: 0;
+    }
+
+    .tab-checkbox-container {
+        display: flex;
+        align-items: center;
+        display: inline-block;
+        color: var(--gray-100);
+        margin-right: 10px;
+        padding: 5px 10px;
+        background-color: #374151;
+        cursor: pointer;
+        font-family: var(--body-ff);
+        font-size: 16px;
+        border-radius: 20px;
+    }
+
+    .tab-checkbox-container input {
+        margin-right: 5px;
+        color: var(--gray-100);
+    }
+
+    .tab-checkbox-container label {
+        color: var(--gray-100);
+    }
+
+    .table-container {
+        overflow: auto;
+    }
+
+    .table {
+        width: 100%;
+    }
+
+    .table th:first-child,
+    .table td:first-child {
+        position: sticky;
+        left: 0;
+        background-color: #f2f2f2;
+        /* Cor de fundo da primeira coluna fixa */
+    }
+    .inicio {
+        position: relative;
+    }
+      
+    .movimentacao {
+        display:block;
+        width: 10%;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        animation: moveLeftRight 1s infinite linear;
+    }
+    
+    @keyframes moveLeftRight {
+    0%, 100% {
+        right: 0;
+    }
+    50% {
+        right: 10px; /* Defina a quantidade de deslocamento para a direita */
+    }
+    }
+}
+
 @media print {
     body {
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-      -webkit-transform-style: preserve-3d;
-      transform-style: preserve-3d;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-transform-style: preserve-3d;
+        transform-style: preserve-3d;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
+
     .elemento-a-ocultar {
-          display: none;
+        display: none;
     }
 }
 
@@ -556,6 +679,3 @@ table .btn-abrir{
     size: A4;
     margin: 0;
 }
-
-
-

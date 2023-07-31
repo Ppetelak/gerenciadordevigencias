@@ -33,7 +33,10 @@
         <li onclick="changeTab(0)" class="active" id="tabMounthermon">Mount Hermon</li>
         <li onclick="changeTab(1)" id="tabCompar">Compar</li>
         <li onclick="changeTab(2)" id="tabClasse">Classe Administradora</li>
-        <input type="checkbox" id="checkboxTodos"> <label>Marcar todos </label><br>
+        <div class="tab-checkbox-container">
+          <input type="checkbox" id="checkboxTodos">
+          <label for="checkboxTodos">Marcar todos</label>
+        </div>
       </ul>
       <div class="tab-content active" id="tabMounthermon">
         <div class="operadoras" id="mounthermon">
@@ -106,75 +109,78 @@
       </p>
       <p> Data próxima atualização: <%= informacoesGerais.data_proxima_atualizacao.toLocaleDateString('pt-BR') %>
       </p>
+      <img class="movimentacao "src="./img-privadas/dedo-movimento.png">
     </div>
     <div class="div-degrade"> </div>
-    <div class="impressao" id="tabelaVigencias">
-      <table class="table">
-        <thead id="custom-thead">
-          <tr>
-            <th scope="col" class="col-1 h4"><strong>Operadora</strong></th>
-            <th scope="col" class="col-4 h4"><strong>Região</strong></th>
-            <th scope="col" class="col-3 h4"><strong>Vigência/Fechamento</strong></th>
-            <th scope="col" class="col-4 h4"><strong>Manual</strong></th> 
-          </tr>
-        </thead>
-        <tbody>
-          <% for (let i=0; i < operadoras.length; i++) { %>
-            <% if (operadoras[i].vigencias.length > 0 && operadoras[i].fechamentos.length > 0) { %>
-            <tr scope="row" class="operadora-table table" data-operadora="<%= operadoras[i].nome %>"
-              data-administradora="<%= operadoras[i].administradora %>" data-id="<%= operadoras[i].id %>">
-              <td scope="col" class="col-1">
-                <div class="img-container">
-                  <img class="img-fluid" src="<%= operadoras[i].logo %>">
-                </div>
-              </td>
-              <td class="col-4">
-                <%= operadoras[i].abrangencia %>
-              </td>
-              <td class="col-3">
-                <% for (let j = 0; j < operadoras[i].vigencias.length; j++) { %>
-                  <table class="table table-bordered">
-                    <tr class="my-2">
-                      <td class="px-2">
-                        <% // Check if the date data for vigencias is present before formatting and rendering %>
-                        <% if (operadoras[i].vigencias[j]) { %>
-                          <% // Convert the date string to a Date object for vigencias %>
-                          <% const vigenciaDate = new Date(operadoras[i].vigencias[j]); %>
-                          <% // Get the day, month, and year separately %>
-                          <% const vigenciaDay = String(vigenciaDate.getDate()).padStart(2, '0'); %>
-                          <% const vigenciaMonth = String(vigenciaDate.getMonth() + 1).padStart(2, '0'); %>
-                          <% const vigenciaYear = String(vigenciaDate.getFullYear()).slice(-2); %>
-                          <% // Create the formatted date string in the desired format for vigencias %>
-                          <%= `${vigenciaDay}-${vigenciaMonth}-${vigenciaYear}` %>
-                        <% } %>
-                      </td>
-                      <td class="px-2">
-                        <% // Check if the date data for fechamentos is present before formatting and rendering %>
-                        <% if (operadoras[i].fechamentos[j]) { %>
-                          <% // Convert the date string to a Date object for fechamentos %>
-                          <% const fechamentoDate = new Date(operadoras[i].fechamentos[j]); %>
-                          <% // Get the day, month, and year separately %>
-                          <% const fechamentoDay = String(fechamentoDate.getDate()).padStart(2, '0'); %>
-                          <% const fechamentoMonth = String(fechamentoDate.getMonth() + 1).padStart(2, '0'); %>
-                          <% const fechamentoYear = String(fechamentoDate.getFullYear()).slice(-2); %>
-                          <% // Create the formatted date string in the desired format for fechamentos %>
-                          <%= `${fechamentoDay}-${fechamentoMonth}-${fechamentoYear}` %>
-                        <% } %>
-                      </td>
-                    </tr>
-                  </table>
-                <% } %>
-              </td>
-              <td class="col-4">
-                <% if (operadoras[i].areaAtuacao) { %>
-                  <a href="<%= operadoras[i].areaAtuacao %>" target="_blank"><button class="btn btn-info btn-abrir"><i class="bi bi-download"></i> Abrir</button></a>
-                <% } %>
-              </td>
+    <div class="scroll-container">
+      <div class="impressao table-responsive content table-container" id="tabelaVigencias">
+        <table class="table">
+          <thead id="custom-thead" class="sticky-top">
+            <tr>
+              <th scope="col" class="col-md-1 h4"><strong>Operadora</strong></th>
+              <th scope="col" class="col-md-4 h4"><strong>Região</strong></th>
+              <th scope="col" class="col-md-3 h4"><strong>Vigência/Fechamento</strong></th>
+              <th scope="col" class="col-md-4 h4"><strong>Manual</strong></th> 
             </tr>
-            <% } %>
-            <% } %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <% for (let i=0; i < operadoras.length; i++) { %>
+              <% if (operadoras[i].vigencias.length > 0 && operadoras[i].fechamentos.length > 0) { %>
+              <tr scope="row" class="operadora-table table" data-operadora="<%= operadoras[i].nome %>"
+                data-administradora="<%= operadoras[i].administradora %>" data-id="<%= operadoras[i].id %>">
+                <td scope="col" class="col-1">
+                  <div class="img-container">
+                    <img class="img-fluid" src="<%= operadoras[i].logo %>">
+                  </div>
+                </td>
+                <td class="col-4">
+                  <%= operadoras[i].abrangencia %>
+                </td>
+                <td class="col-3">
+                  <% for (let j = 0; j < operadoras[i].vigencias.length; j++) { %>
+                    <table class="table table-bordered">
+                      <tr class="my-2">
+                        <td class="px-2">
+                          <% // Check if the date data for vigencias is present before formatting and rendering %>
+                          <% if (operadoras[i].vigencias[j]) { %>
+                            <% // Convert the date string to a Date object for vigencias %>
+                            <% const vigenciaDate = new Date(operadoras[i].vigencias[j]); %>
+                            <% // Get the day, month, and year separately %>
+                            <% const vigenciaDay = String(vigenciaDate.getDate()).padStart(2, '0'); %>
+                            <% const vigenciaMonth = String(vigenciaDate.getMonth() + 1).padStart(2, '0'); %>
+                            <% const vigenciaYear = String(vigenciaDate.getFullYear()).slice(-2); %>
+                            <% // Create the formatted date string in the desired format for vigencias %>
+                            <%= `${vigenciaDay}-${vigenciaMonth}-${vigenciaYear}` %>
+                          <% } %>
+                        </td>
+                        <td class="px-2">
+                          <% // Check if the date data for fechamentos is present before formatting and rendering %>
+                          <% if (operadoras[i].fechamentos[j]) { %>
+                            <% // Convert the date string to a Date object for fechamentos %>
+                            <% const fechamentoDate = new Date(operadoras[i].fechamentos[j]); %>
+                            <% // Get the day, month, and year separately %>
+                            <% const fechamentoDay = String(fechamentoDate.getDate()).padStart(2, '0'); %>
+                            <% const fechamentoMonth = String(fechamentoDate.getMonth() + 1).padStart(2, '0'); %>
+                            <% const fechamentoYear = String(fechamentoDate.getFullYear()).slice(-2); %>
+                            <% // Create the formatted date string in the desired format for fechamentos %>
+                            <%= `${fechamentoDay}-${fechamentoMonth}-${fechamentoYear}` %>
+                          <% } %>
+                        </td>
+                      </tr>
+                    </table>
+                  <% } %>
+                </td>
+                <td class="col-4">
+                  <% if (operadoras[i].areaAtuacao) { %>
+                    <a href="<%= operadoras[i].areaAtuacao %>" target="_blank"><button class="btn btn-info btn-abrir"><i class="bi bi-download"></i> Abrir</button></a>
+                  <% } %>
+                </td>
+              </tr>
+              <% } %>
+              <% } %>
+          </tbody>
+        </table>
+      </div>
     </div>
     <div class="administradorasfooter">
       <div class="tablefooter">
