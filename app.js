@@ -203,71 +203,65 @@ app.post('/update-vigencias', (req, res) => {
     db.query('TRUNCATE TABLE vigencias', (err, result) => {
       if (err) {
         console.error('Erro ao limpar a tabela de vigências:', err);
-
-        // Reverter a transação em caso de erro
         db.rollback(() => {
           console.error('Transação revertida.');
           return res.status(500).json({ message: 'Erro interno do servidor' });
         });
-      }
+      } else {
+        // Inserir as novas vigências e fechamentos no array 'values'
+        const values = [];
+        operadoras.forEach((operadora) => {
+          const { id, vigencias, fechamentos } = operadora;
 
-      // Inserir as novas vigências e fechamentos no banco de dados
-      const values = [];
-      operadoras.forEach((operadora) => {
-        const { id, vigencias, fechamentos } = operadora;
-
-        vigencias.forEach((vigencia, index) => {
-          const fechamento = fechamentos[index];
-          values.push([id, vigencia, fechamento]); // Inclui o operadora_id no array de valores
-        });
-      });
-
-      const query = 'INSERT INTO vigencias (operadora_id, vigencia, fechamento) VALUES ?';
-      db.query(query, [values], (err, result) => {
-        if (err) {
-          console.error('Erro ao inserir as vigências e fechamentos:', err);
-
-          // Reverter a transação em caso de erro
-          db.rollback(() => {
-            console.error('Transação revertida.');
-            return res.status(500).json({ message: 'Erro interno do servidor' });
+          vigencias.forEach((vigencia, index) => {
+            const fechamento = fechamentos[index];
+            values.push([id, vigencia, fechamento]); // Inclui o operadora_id no array de valores
           });
-        }
+        });
 
-        // Inserir a data de atualização e data da próxima atualização no banco de dados
-        const dataQuery = 'INSERT INTO informacoes_gerais (data_atualizacao, data_proxima_atualizacao) VALUES (?, ?)';
-        db.query(dataQuery, [dataAtualizacaoFormatada, dataProximaAtualizacaoFormatada], (err, result) => {
+        // Inserir todos os valores no banco de dados de uma vez
+        const query = 'INSERT INTO vigencias (operadora_id, vigencia, fechamento) VALUES ?';
+        db.query(query, [values], (err, result) => {
           if (err) {
-            console.error('Erro ao inserir as datas de atualização:', err);
-
-            // Reverter a transação em caso de erro
+            console.error('Erro ao inserir as vigências e fechamentos:', err);
             db.rollback(() => {
               console.error('Transação revertida.');
               return res.status(500).json({ message: 'Erro interno do servidor' });
             });
+          } else {
+            // Inserir a data de atualização e data da próxima atualização no banco de dados
+            const dataQuery = 'INSERT INTO informacoes_gerais (data_atualizacao, data_proxima_atualizacao) VALUES (?, ?)';
+            db.query(dataQuery, [dataAtualizacaoFormatada, dataProximaAtualizacaoFormatada], (err, result) => {
+              if (err) {
+                console.error('Erro ao inserir as datas de atualização:', err);
+                db.rollback(() => {
+                  console.error('Transação revertida.');
+                  return res.status(500).json({ message: 'Erro interno do servidor' });
+                });
+              } else {
+                // Confirmar a transação
+                db.commit((err) => {
+                  if (err) {
+                    console.error('Erro ao confirmar a transação:', err);
+                    db.rollback(() => {
+                      console.error('Transação revertida.');
+                      return res.status(500).json({ message: 'Erro interno do servidor' });
+                    });
+                  } else {
+                    // Transação bem-sucedida
+                    res.cookie('alertSucess', 'Vigências atualizadas com sucesso!', { maxAge: 3000 });
+                    res.status(200).json({ message: 'Valores atualizados com sucesso' });
+                  }
+                });
+              }
+            });
           }
-
-          // Confirmar a transação
-          db.commit((err) => {
-            if (err) {
-              console.error('Erro ao confirmar a transação:', err);
-
-              // Reverter a transação em caso de erro
-              db.rollback(() => {
-                console.error('Transação revertida.');
-                return res.status(500).json({ message: 'Erro interno do servidor' });
-              });
-            }
-
-            // Transação bem-sucedida
-            res.cookie('alertSucess', 'Vigências atualizadas com sucesso!', { maxAge: 3000 });
-            res.status(200).json({ message: 'Valores atualizados com sucesso' });
-          });
         });
-      });
+      }
     });
   });
 });
+
 
 app.post('/operadoras-update', (req, res) => {
   const { id, nome, administradora, abrangencia, areaAtuacao } = req.body;

@@ -9,7 +9,7 @@ function adicionarCampoVigencia(event) {
                 value="">
         </td>
         <td>
-            <input type="date" class="fechamento-input form-control"
+            <input type="datetime-local" class="fechamento-input form-control"
                 value="">
         </td>
         <td>
