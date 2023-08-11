@@ -159,7 +159,7 @@
                             <% const fechamentoDay = String(fechamentoDate.getDate()).padStart(2, '0'); %>
                             <% const fechamentoMonth = String(fechamentoDate.getMonth() + 1).padStart(2, '0'); %>
                             <% const fechamentoYear = String(fechamentoDate.getFullYear()).slice(-2); %>
-                            <% const fechamentoTime = fechamentoDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); %>
+                            <% const fechamentoTime = fechamentoDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }); %>
                             <%= `${fechamentoDay}-${fechamentoMonth}-${fechamentoYear} até às ${fechamentoTime}` %>
                           <% } %>
                         </td>
