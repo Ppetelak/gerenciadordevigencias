@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alteração Vigências/Fechamentos</title>
+    <link rel="icon" type="image/png" href="/img-privadas/faviconlinhamasterv2.png">
     <link rel="stylesheet" href="/css/dashboard.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -18,10 +19,8 @@
     <script src="/js/jquery.ui.datepicker-pt-BR.js"></script>
 </head>
 
-<body>
-    <div class="navbardiv"> 
+<body class="operadorasBody">
         <%- include('navbar') %>
-    </div>
     <div class="alert alert-success alert-dismissible fade show fixed-top" role="alert" id="Message" style="display:none">
         Sucesso!
       </div>
@@ -31,7 +30,7 @@
         <div class="content">
             <h1>Operadoras</h1>
             <table class="table">
-                <thead class="sticky-top custom-thead">
+                <thead class="custom-thead">
                     <tr>
                         <th scope="col">ID</th>
                         <th scope="col">Logo</th>

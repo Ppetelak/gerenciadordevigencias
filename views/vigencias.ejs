@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alteração Vigências/Fechamentos</title>
+    <title>Alteração Vigências</title>
+    <link rel="icon" type="image/png" href="/img-privadas/faviconlinhamasterv2.png">
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -61,41 +62,55 @@
                     </div>
                     <div class="col-7">
                         <div class="row vigencias">
-                            <% if (operadoras[i].vigencias.length> 0) { %>
-                                <% for (let j=0; j < operadoras[i].vigencias.length; j++) { %>
-                                    <div class="row vigencia">
-                                        <div class="col-4">
-                                            <input 
-                                                type="date" 
-                                                class="vigencia-input form-control" value="<%= operadoras[i].vigencias[j] %>"
-                                                name="dataVigencia"
-                                            />
-                                        </div>
-                                        <div class="col-4">
-                                            <input 
-                                                type="datetime-local" class="movimentacao-input form-control"
-                                                value="<%= operadoras[i].fechamentos[j] %>"
-                                                name="dataMovimentacao"
-                                            />
-                                        </div>
-                                        <div class="col-4">
-                                            <input 
-                                                type="datetime-local" class="fechamento-input form-control"
-                                                value="<%= operadoras[i].fechamentos[j] %>"
-                                                name="dataFechamento"
-                                            />
-                                        </div>
-                                        <button 
-                                                type="button" 
-                                                class="excluir-btn btn btn-danger" title="Excluir vigência">
-                                                <i
-                                                    class="bi bi-x-circle">
-                                                </i>
-                                            </button>
-                                        <!-- <div class="col-3">
-                                            
-                                        </div> -->
+                            <% if (operadoras[i].vigencias.length > 0) { %>
+                                <% for (let j = 0; j < operadoras[i].vigencias.length; j++) { %>
+                                  <div class="row vigencia">
+                                    <div class="col-4">
+                                      <% 
+                                        // Formate a data no formato AAAA-MM-DD
+                                        const vigenciaDate = new Date(operadoras[i].vigencias[j]);
+                                        const vigenciaFormatted = vigenciaDate.toISOString().split('T')[0];
+                                      %>
+                                      <input 
+                                        type="date" 
+                                        class="vigencia-input form-control" 
+                                        value="<%= vigenciaFormatted %>"
+                                        name="dataVigencia"
+                                      />
                                     </div>
+                                    <div class="col-4">
+                                      <% 
+                                        // Formate a data/hora no formato AAAA-MM-DDTHH:MM
+                                        const movimentacaoDate = new Date(operadoras[i].movimentacao[j]);
+                                        const movimentacaoFormatted = movimentacaoDate.toISOString().slice(0, 16);
+                                      %>
+                                      <input 
+                                        type="datetime-local" 
+                                        class="movimentacao-input form-control"
+                                        value="<%= movimentacaoFormatted %>"
+                                        name="dataMovimentacao"
+                                      />
+                                    </div>
+                                    <div class="col-4">
+                                      <% 
+                                        // Formate a data/hora no formato AAAA-MM-DDTHH:MM
+                                        const fechamentoDate = new Date(operadoras[i].fechamentos[j]);
+                                        const fechamentoFormatted = fechamentoDate.toISOString().slice(0, 16);
+                                      %>
+                                      <input 
+                                        type="datetime-local" 
+                                        class="fechamento-input form-control"
+                                        value="<%= fechamentoFormatted %>"
+                                        name="dataFechamento"
+                                      />
+                                    </div>
+                                    <button 
+                                      type="button" 
+                                      class="excluir-btn btn btn-danger" 
+                                      title="Excluir vigência">
+                                      <i class="bi bi-x-circle"></i>
+                                    </button>
+                                  </div>
                                 <% } %>
                                         <button type="button"  class="adicionarvigencia btn btn-secondary"><i class="bi bi-plus-circle"></i> Adicionar Vigência</button>
                                 <% } else { %>
