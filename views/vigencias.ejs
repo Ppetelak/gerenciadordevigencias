@@ -5,110 +5,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alteração Vigências/Fechamentos</title>
-    <link rel="stylesheet" href="/css/dashboard.css">
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
-    <script src="/js/jquery.ui.datepicker-pt-BR.js"></script>
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
-    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;800&display=swap" rel="stylesheet">
-  
 
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/js/jquery.ui.datepicker-pt-BR.js"></script>
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
-    <div class="navbardiv"> 
-        <%- include('navbar') %>
-    </div>
-    <div class="alert alert-success alert-dismissible fade show fixed-top" role="alert" id="Message" style="display:none">
+    <%- include('navbar') %>
+    <div class="alert alert-success alert-dismissible fade show fixed-top" role="alert" id="Message"
+        style="display:none">
         Sucesso!
-      </div>
-      <div class="alert alert-danger alert-dismissible fade show fixed-top" role="alert" id="MessageError" style="display:none">
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show fixed-top" role="alert" id="MessageError"
+        style="display:none">
         Erro!
-      </div>
-        <div class="content">
+    </div>
+    <div class="content">        
+        <div class="row cabecalho">
             <h1>Alteração de Vigências / Fechamentos</h1>
-            <table class="table">
-                <thead class="sticky-top custom-thead">
-                    <tr>
-                        <th scope="col">Logo</th>
-                        <th scope="col">Nome</th>
-                        <th scope="col">Administradora</th>
-                        <th scope="col">Vigência/Fechamento</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% for (let i=0; i < operadoras.length; i++) { %>
-                        <tr scope="row" class="Linhaoperadora" data-id="<%= operadoras[i].id %>">
-                            <td scope="col"><img src="<%= operadoras[i].logo %>"></td>
-                            <td>
-                                <%= operadoras[i].nome %>
-                            </td>
-                            <td scope="col">
-                                <%= operadoras[i].administradora %>
-                            </td>
-                            <td scope="col">
-                                <% if (operadoras[i].vigencias.length > 0) { %>
-                                    <% for (let j=0; j < operadoras[i].vigencias.length; j++) { %>
-                                        <table class="table table-borderless">
-                                            <tr>
-                                                <td>
-                                                    <input type="date" class="vigencia-input form-control"
-                                                        value="<%= operadoras[i].vigencias[j] %>">
-                                                </td>
-                                                <td>
-                                                    <input type="datetime-local" class="fechamento-input form-control"
-                                                        value="<%= operadoras[i].fechamentos[j] %>">
-                                                </td>
-                                                <td>
-                                                    <button class="excluir-btn btn btn-danger" title="Excluir vigência"><i class="bi bi-x-circle"></i></button>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    <% } %>
-                                <% } else { %>
-                                    <p class="Sem-vigencias">Sem vigências disponíveis</p>
-                                <% } %>
-                                <button class="adicionar-btn btn btn-secondary"><i class="bi bi-plus-circle"></i> Adicionar Vigência</button>
-                            </td>
-                        </tr>
-                    <% } %>
-                </tbody>
-            </table>
-            <label for="data-atualizacao">Data de atualização:</label>
-            <input type="text" id="data-atualizacao" class="data-atualizacao-input" readonly>
-
-
-            <label for="data-proxima-atualizacao">Data da próxima atualização:</label>
-            <input type="text" id="data-proxima-atualizacao" class="data-proxima-atualizacao-input"
-                placeholder="Insira a data">
-
-            <button class="update-btn btn btn-primary">Atualizar Valores</button>
-            <br>
+            <div class="col-1">
+                Logo
+            </div>
+            <div class="col-2">
+                Nome
+            </div>
+            <div class="col-2">
+                Administradora
+            </div>
+            <div class="col-7">
+                Vigência - Movimentação - Fechamento
+            </div>
         </div>
-        <script src="/js/vigencias.js"></script>
-        <script>
-            $(document).ready(function () {
-                $("#data-proxima-atualizacao").datepicker();
-                var dataAtual = new Date();
-                // Formata a data no formato DD/MM/AAAA
-                var dia = dataAtual.getDate().toString().padStart(2, '0');
-                var mes = (dataAtual.getMonth() + 1).toString().padStart(2, '0');
-                var ano = dataAtual.getFullYear();
-                var dataFormatada = dia + '/' + mes + '/' + ano;
+        <form>
+            <% for (let i=0; i < operadoras.length; i++) { %>
+                <div class="row operadora">
+                    <input type="hidden" name="idOperadora" value="<%= operadoras[i].id %>" class="idOperadora">
+                    <div class="col-1 img">
+                        <img src="<%= operadoras[i].logo %>">
+                    </div>
+                    <div class="col-2">
+                        <%= operadoras[i].nome %>
+                    </div>
+                    <div class="col-2">
+                        <%= operadoras[i].administradora %>
+                    </div>
+                    <div class="col-7">
+                        <div class="row vigencias">
+                            <% if (operadoras[i].vigencias.length> 0) { %>
+                                <% for (let j=0; j < operadoras[i].vigencias.length; j++) { %>
+                                    <div class="row vigencia">
+                                        <div class="col-4">
+                                            <input 
+                                                type="date" 
+                                                class="vigencia-input form-control" value="<%= operadoras[i].vigencias[j] %>"
+                                                name="dataVigencia"
+                                            />
+                                        </div>
+                                        <div class="col-4">
+                                            <input 
+                                                type="datetime-local" class="movimentacao-input form-control"
+                                                value="<%= operadoras[i].fechamentos[j] %>"
+                                                name="dataMovimentacao"
+                                            />
+                                        </div>
+                                        <div class="col-4">
+                                            <input 
+                                                type="datetime-local" class="fechamento-input form-control"
+                                                value="<%= operadoras[i].fechamentos[j] %>"
+                                                name="dataFechamento"
+                                            />
+                                        </div>
+                                        <button 
+                                                type="button" 
+                                                class="excluir-btn btn btn-danger" title="Excluir vigência">
+                                                <i
+                                                    class="bi bi-x-circle">
+                                                </i>
+                                            </button>
+                                        <!-- <div class="col-3">
+                                            
+                                        </div> -->
+                                    </div>
+                                <% } %>
+                                        <button type="button"  class="adicionarvigencia btn btn-secondary"><i class="bi bi-plus-circle"></i> Adicionar Vigência</button>
+                                <% } else { %>
+                                <p class="Sem-vigencias">Sem vigências disponíveis</p>
+                                <button type="button" class="adicionarvigencia btn btn-secondary"><i class="bi bi-plus-circle"></i> Adicionar Vigência</button>
+                            <% } %>                                
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </form>
+            <div class="row footer">
+                <div class="row">
+                    <h3> Salvar informações </h3>
+                    <div class="col-6">  
+                        <p> 
+                            Clique no botão para salvar as alterações realizadas até o momento, lembrando que não será publicado, apenas será publicado quando clicar no botão da seção abaixo em "Publicar"
+                            
+                        </p>
+                    </div>
+                    <div class="col-6"> 
+                        <button type="button" class="salvar-btn btn btn-primary">Salvar informações</button>
+                        <a href="/visualizar" target="_blank"><button type="button" class="btn btn-primary">Visualizar Prévia</button></a>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <script src="/js/vigencias.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#data-proxima-atualizacao").datepicker();
+            var dataAtual = new Date();
+            // Formata a data no formato DD/MM/AAAA
+            var dia = dataAtual.getDate().toString().padStart(2, '0');
+            var mes = (dataAtual.getMonth() + 1).toString().padStart(2, '0');
+            var ano = dataAtual.getFullYear();
+            var dataFormatada = dia + '/' + mes + '/' + ano;
 
-                // Define o valor do campo data-atualizacao
-                $('#data-atualizacao').val(dataFormatada);
+            // Define o valor do campo data-atualizacao
+            $('#data-atualizacao').val(dataFormatada);
 
-                // Desativa a edição do campo
-                $('#data-atualizacao').prop('readonly', true);
-            });
-        </script>
+            // Desativa a edição do campo
+            $('#data-atualizacao').prop('readonly', true);
+        });
+    </script>
 </body>
 
 </html>

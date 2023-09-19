@@ -1,38 +1,6 @@
-function adicionarCampoVigencia(event) {
-    const tr = event.target.closest('.Linhaoperadora');
-    const td = tr.querySelector('td:last-child');
-    const table = document.createElement('table');
-    table.innerHTML = `
-    <tr>
-        <td>
-            <input type="date" class="vigencia-input form-control"
-                value="">
-        </td>
-        <td>
-            <input type="datetime-local" class="fechamento-input form-control"
-                value="">
-        </td>
-        <td>
-            <button class="excluir-btn btn btn-danger">Excluir</button>
-        </td>
-    </tr>
-`;
-    table.classList.add('table');
-    td.insertBefore(table, event.target);
-
-    excluirCampoVigencia()
-}
-
-// Função para excluir um campo de vigência e fechamento
-function excluirCampoVigencia() {
-    var buttons = document.querySelectorAll(".excluir-btn");
-    for (var i = 0; i < buttons.length; i++) {
-        buttons[i].addEventListener("click", function (event) {
-            var tabela = event.target.closest('table')
-            tabela.remove()
-        });
-    };
-}
+$('.vigencias').on('click', '.excluir-btn', function () {
+    $(this).closest('.vigencia').remove();
+})
 
 function verificarInputsVazios() {
     var inputs = document.querySelectorAll('input'); // Seleciona todos os inputs do formulário
@@ -46,6 +14,48 @@ function verificarInputsVazios() {
   
     return true; // Retorna verdadeiro se todos os inputs estiverem preenchidos
   }
+
+$('.salvar-btn').on('click', function () {
+    let vigencias =[]
+    $('.operadora').each(function () { 
+        var linhaOperadora = $(this)
+        var idOperadora = $(this).find('[name="idOperadora"]').val(); // Acessa diretamente o valor do campo oculto
+        linhaOperadora.find('.vigencia').each(function () {
+            const vigenciaData = {
+                idOperadora: idOperadora,
+                dataVigencia: $(this).find('[name="dataVigencia"]').val(),
+                dataMovimentacao: $(this).find('[name="dataMovimentacao"]').val(),
+                dataFechamento: $(this).find('[name="dataFechamento"]').val(),
+            }
+            vigencias.push(vigenciaData);
+        });
+    });
+ /*    const dataAtualizacao = document.querySelector('.data-atualizacao-input').value;
+    const dataProximaAtualizacao = document.querySelector('.data-proxima-atualizacao-input').value;
+ */
+    console.log(vigencias)
+
+    fetch('/salvar-infos', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ vigencias })
+    }).then((response) => {
+            if (response.ok) {
+                showMessage(response.message)
+                //location.reload();
+                //alert('Valores atualizados com sucesso!');
+            } else {
+                alert('Erro ao atualizar valores. Por favor, tente novamente.');
+            }
+        })
+        .catch((error) => {
+            console.error('Erro ao enviar os dados:', error);
+            alert('Erro ao enviar os dados. Por favor, tente novamente.');
+        });
+    
+})
 
 // Função para obter os dados atualizados e enviar para o servidor
 function atualizarValores() {
@@ -77,12 +87,12 @@ function atualizarValores() {
         const dataProximaAtualizacao = document.querySelector('.data-proxima-atualizacao-input').value;
 
         // Envia os dados para o servidor
-        fetch('/update-vigencias', {
+        fetch('/salvar-infos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ operadoras, dataAtualizacao, dataProximaAtualizacao })
+            body: JSON.stringify({ vigencias, dataAtualizacao, dataProximaAtualizacao })
         })
             .then((response) => {
                 if (response.ok) {
@@ -102,21 +112,44 @@ function atualizarValores() {
     }
 }
 
+$('.adicionarvigencia').click(function () {
+    const $button = $(this)
 
-// Adiciona os event listeners aos botões
-document.addEventListener('DOMContentLoaded', () => {
-    const tableBody = document.querySelector('tbody');
-    const updateBtn = document.querySelector('.update-btn');
+    const novavigencia = `
+    <div class="row vigencia">
+        <div class="col-4">
+            <input 
+                type="date" 
+                class="vigencia-input form-control" value="" 
+                name="dataVigencia"
+            />
+        </div>
+        <div class="col-4">
+            <input 
+                type="datetime-local" class="movimentacao-input form-control"
+                value=""
+                name="dataMovimentacao"
+            />
+        </div>
+        <div class="col-4">
+            <input 
+                type="datetime-local" class="fechamento-input form-control"
+                value=""
+                name="dataFechamento"
+            />
+        </div>
+        <button 
+                class="excluir-btn btn btn-danger" title="Excluir vigência">
+                <i
+                    class="bi bi-x-circle">
+                </i>
+        </button>
+    </div>
+    `;
 
-    tableBody.addEventListener('click', (event) => {
-        if (event.target.classList.contains('adicionar-btn')) {
-            adicionarCampoVigencia(event);
-        }
-    });
-
-    updateBtn.addEventListener('click', atualizarValores);
-    excluirCampoVigencia();
-});
+    $(novavigencia).insertBefore($button)
+    //excluirCampoVigencia()
+})
 
 // Verifica se o cookie de deleteMessage existe
 if (document.cookie.includes('alertSucess')) {

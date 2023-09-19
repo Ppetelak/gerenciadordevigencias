@@ -55,7 +55,10 @@ const secretKey = generateSecretKey();
 app.use(session({
     secret: secretKey,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 2 * 60 * 60 * 1000 // 2 horas em milissegundos
+    }
   }));
 
 /* Conexão com banco de dados */
@@ -140,7 +143,7 @@ app.get('/vigencias', verificaAutenticacao, (req, res) => {
     }
 
     // Consulta para obter as informações de vigência e fechamento relacionadas a cada operadora
-    const query2 = 'SELECT * FROM vigencias WHERE operadora_id = ?';
+    const query2 = 'SELECT * FROM vigencias_temp WHERE idOperadora = ?';
     const promises = operadoras.map((operadora) => {
       return new Promise((resolve, reject) => {
         db.query(query2, [operadora.id], (err, resultados) => {
@@ -149,8 +152,9 @@ app.get('/vigencias', verificaAutenticacao, (req, res) => {
             reject(err);
           } else {
             // Atribuir os valores de vigência e fechamento à operadora correspondente
-            operadora.vigencias = resultados.map((resultado) => resultado.vigencia);
-            operadora.fechamentos = resultados.map((resultado) => resultado.fechamento);
+            operadora.vigencias = resultados.map((resultado) => resultado.dataVigencia);
+            operadora.fechamentos = resultados.map((resultado) => resultado.dataFechamento);
+            operadora.movimentacao = resultados.map((resultado) => resultado.dataMovimentacao);
             resolve();
           }
         });
@@ -182,86 +186,132 @@ app.get('/operadoras', verificaAutenticacao, (req, res) => {
   });
 })
 
-app.post('/update-vigencias', (req, res) => {
-  const { operadoras, dataAtualizacao, dataProximaAtualizacao } = req.body;
+app.post('/salvar-infos',(req, res) => {
+  const { vigencias } = req.body;
 
-  // Converte a dataAtualizacao e dataProximaAtualizacao para o formato adequado
+  const sqlExcluirVigencias = 'TRUNCATE TABLE vigencias_temp';
+  const sqlSalvarVigencias = 'INSERT INTO vigencias_temp (idOperadora, dataVigencia, dataMovimentacao, dataFechamento) VALUES (?, ?, ?, ?)';
+
+
+  db.query(sqlExcluirVigencias, (err, resultExc) => {
+    if(err){
+      console.error('Erro na exclusão das vigencias já cadastradas')
+      res.cookie('alertError', 'Erro ao SALVAR vigências, verifique e tente novamente', { maxAge: 3000 });
+      res.status(500).json({ message: 'Erro interno do servidor' });
+    }
+    if(Array.isArray(vigencias)) {
+      vigencias.forEach((vigencia) => {
+        db.query(sqlSalvarVigencias, [vigencia.idOperadora, vigencia.dataVigencia,vigencia.dataMovimentacao, vigencia.dataFechamento],(err, result) => {
+          if(err){
+            console.error('Erro ao cadastrar as vigências na tela temporária', err) 
+          }
+        })
+      })
+    }
+    res.cookie('alertSucess', 'Dados de Vigências SALVOS com sucesso!', { maxAge: 3000 })
+    res.status(200).json({ message: 'Dados de Vigências SALVOS com sucesso!' });
+    //console.log('Dados salvos:', vigencias)
+  });
+})
+
+app.get('/visualizar', (req,res) => {
+  const query = 'SELECT o.id, o.logo, o.abrangencia, o.areadeatuacao, o.nome, o.administradora, v.dataVigencia, v.dataMovimentacao, v.dataFechamento FROM operadoras o LEFT JOIN vigencias_temp v ON o.id = v.idOperadora';
+  db.query(query, (err, resultados) => {
+    if (err) {
+      console.error('Erro ao consultar o banco de dados:', err);
+      res.status(500).send('Erro ao processar a solicitação');
+      return;
+    }
+
+    const operadoras = [];
+
+    // Agrupar os resultados por ID da operadora
+    const operadorasMap = new Map();
+    resultados.forEach((resultado) => {
+      const operadoraId = resultado.id;
+      if (!operadorasMap.has(operadoraId)) {
+        // Criar um novo objeto de operadora
+        const operadora = {
+          id: operadoraId,
+          logo: resultado.logo,
+          abrangencia: resultado.abrangencia,
+          areaAtuacao: resultado.areadeatuacao,
+          nome: resultado.nome,
+          administradora: resultado.administradora,
+          vigencias: [],
+          movimentacoes: [],
+          fechamentos: []
+        };
+        operadorasMap.set(operadoraId, operadora);
+        operadoras.push(operadora);
+      }
+
+      // Adicionar vigência e fechamento à operadora correspondente
+      const operadora = operadorasMap.get(operadoraId);
+      operadora.vigencias.push(resultado.dataVigencia);
+      operadora.movimentacoes.push(resultado.dataMovimentacao);
+      operadora.fechamentos.push(resultado.dataFechamento);
+    });
+
+    const queryInformacoesGerais = 'SELECT data_atualizacao, data_proxima_atualizacao FROM informacoes_gerais ORDER BY id DESC LIMIT 1';
+    db.query(queryInformacoesGerais, (err, resultadoInformacoesGerais) => {
+      if (err) {
+        console.error('Erro ao consultar as informações gerais:', err);
+        res.status(500).send('Erro ao processar a solicitação');
+        return;
+      }
+
+      // Verificar se há resultados
+      if (resultadoInformacoesGerais.length === 0) {
+        res.status(404).send('Nenhuma informação encontrada');
+        return;
+      }
+
+      const informacoesGerais = resultadoInformacoesGerais[0];
+
+      res.render('visualizacaocalendario', { operadoras, informacoesGerais });
+      //console.log(operadoras)
+    });
+  });
+})
+
+app.post('/copiar-dados', (req, res) => {
+  const { dataAtualizacao, dataProximaAtualizacao } = req.body;
+
   const [diaAtualizacao, mesAtualizacao, anoAtualizacao] = dataAtualizacao.split('/');
   const dataAtualizacaoFormatada = `${anoAtualizacao}-${mesAtualizacao}-${diaAtualizacao}`;
 
   const [diaProxima, mesProxima, anoProxima] = dataProximaAtualizacao.split('/');
   const dataProximaAtualizacaoFormatada = `${anoProxima}-${mesProxima}-${diaProxima}`;
 
-  // Iniciar uma transação
-  db.beginTransaction((err) => {
+  const queryDelete = 'TRUNCATE TABLE vigencias';
+  const query = 'INSERT INTO vigencias SELECT * FROM vigencias_temp';
+  const queryInfos = 'INSERT INTO informacoes_gerais (data_atualizacao, data_proxima_atualizacao) VALUES (?, ?)'
+  
+  db.query(queryDelete, (err, result) => {
     if (err) {
-      console.error('Erro ao iniciar a transação:', err);
-      return res.status(500).json({ message: 'Erro interno do servidor' });
-    }
-
-    // Limpar as vigências e fechamentos existentes no banco de dados
-    db.query('TRUNCATE TABLE vigencias', (err, result) => {
-      if (err) {
-        console.error('Erro ao limpar a tabela de vigências:', err);
-        db.rollback(() => {
-          console.error('Transação revertida.');
-          return res.status(500).json({ message: 'Erro interno do servidor' });
-        });
-      } else {
-        // Inserir as novas vigências e fechamentos no array 'values'
-        const values = [];
-        operadoras.forEach((operadora) => {
-          const { id, vigencias, fechamentos } = operadora;
-
-          vigencias.forEach((vigencia, index) => {
-            const fechamento = fechamentos[index];
-            values.push([id, vigencia, fechamento]); // Inclui o operadora_id no array de valores
+      console.error('Erro ao excluir dados da tabela de vigências', err);
+      res.status(500).json({ error: 'Erro ao excluir dados da tabela de vigências' });
+    } else {
+      db.query(query, (err, result) => {
+        if (err) {
+          console.error('Erro ao salvar Publicar as informações', err);
+          res.status(500).json({ error: 'Erro ao salvar Publicar as informações' });
+        } else {
+          db.query(queryInfos, [dataAtualizacaoFormatada, dataProximaAtualizacaoFormatada], (err, result) => {
+            if (err) {
+              console.error('Erro ao copiar as informações para a tabela de vigências', err);
+              res.status(500).json({ error: 'Erro ao copiar as informações para a tabela de vigências' });
+            } else {
+              res.cookie('alertSucess', 'Dados de Vigências PUBLICADOS com sucesso!', { maxAge: 3000 });
+              res.status(200).json({ message: 'Vigências PUBLICADAS com sucesso!' });
+            }
           });
-        });
-
-        // Inserir todos os valores no banco de dados de uma vez
-        const query = 'INSERT INTO vigencias (operadora_id, vigencia, fechamento) VALUES ?';
-        db.query(query, [values], (err, result) => {
-          if (err) {
-            console.error('Erro ao inserir as vigências e fechamentos:', err);
-            db.rollback(() => {
-              console.error('Transação revertida.');
-              return res.status(500).json({ message: 'Erro interno do servidor' });
-            });
-          } else {
-            // Inserir a data de atualização e data da próxima atualização no banco de dados
-            const dataQuery = 'INSERT INTO informacoes_gerais (data_atualizacao, data_proxima_atualizacao) VALUES (?, ?)';
-            db.query(dataQuery, [dataAtualizacaoFormatada, dataProximaAtualizacaoFormatada], (err, result) => {
-              if (err) {
-                console.error('Erro ao inserir as datas de atualização:', err);
-                db.rollback(() => {
-                  console.error('Transação revertida.');
-                  return res.status(500).json({ message: 'Erro interno do servidor' });
-                });
-              } else {
-                // Confirmar a transação
-                db.commit((err) => {
-                  if (err) {
-                    console.error('Erro ao confirmar a transação:', err);
-                    db.rollback(() => {
-                      console.error('Transação revertida.');
-                      return res.status(500).json({ message: 'Erro interno do servidor' });
-                    });
-                  } else {
-                    // Transação bem-sucedida
-                    res.cookie('alertSucess', 'Vigências atualizadas com sucesso!', { maxAge: 3000 });
-                    res.status(200).json({ message: 'Valores atualizados com sucesso' });
-                  }
-                });
-              }
-            });
-          }
-        });
-      }
-    });
+        }
+      });
+    }
   });
 });
-
 
 app.post('/operadoras-update', (req, res) => {
   const { id, nome, administradora, abrangencia, areaAtuacao } = req.body;
@@ -379,7 +429,7 @@ app.post('/excluir-operadora', (req, res) => {
 /* rota pública */
 
 app.get('/', (req, res) => {
-  const query = 'SELECT o.id, o.logo, o.abrangencia, o.areadeatuacao, o.nome, o.administradora, v.vigencia, v.fechamento FROM operadoras o LEFT JOIN vigencias v ON o.id = v.operadora_id';
+  const query = 'SELECT o.id, o.logo, o.abrangencia, o.areadeatuacao, o.nome, o.administradora, v.dataVigencia, v.dataMovimentacao, v.dataFechamento FROM operadoras o LEFT JOIN vigencias v ON o.id = v.idOperadora';
   db.query(query, (err, resultados) => {
     if (err) {
       console.error('Erro ao consultar o banco de dados:', err);
@@ -403,6 +453,7 @@ app.get('/', (req, res) => {
           nome: resultado.nome,
           administradora: resultado.administradora,
           vigencias: [],
+          movimentacoes: [],
           fechamentos: []
         };
         operadorasMap.set(operadoraId, operadora);
@@ -411,8 +462,9 @@ app.get('/', (req, res) => {
 
       // Adicionar vigência e fechamento à operadora correspondente
       const operadora = operadorasMap.get(operadoraId);
-      operadora.vigencias.push(resultado.vigencia);
-      operadora.fechamentos.push(resultado.fechamento);
+      operadora.vigencias.push(resultado.dataVigencia);
+      operadora.movimentacoes.push(resultado.dataMovimentacao);
+      operadora.fechamentos.push(resultado.dataFechamento);
     });
 
     const queryInformacoesGerais = 'SELECT data_atualizacao, data_proxima_atualizacao FROM informacoes_gerais ORDER BY id DESC LIMIT 1';
@@ -472,6 +524,8 @@ app.post('/salvarLogo', (req, res) => {
 
 /* Inicializando o servidor */
 
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 3000, (req, res) =>{
+  console.log('Servidor rodando com sucesso na porta: 3000')
+});
 
 
