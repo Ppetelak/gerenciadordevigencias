@@ -62,63 +62,71 @@
                     </div>
                     <div class="col-7">
                         <div class="row vigencias">
-                            <% if (operadoras[i].vigencias.length > 0) { %>
-                                <% for (let j = 0; j < operadoras[i].vigencias.length; j++) { %>
-                                  <div class="row vigencia">
-                                    <div class="col-4">
-                                      <% 
-                                        // Formate a data no formato AAAA-MM-DD
-                                        const vigenciaDate = new Date(operadoras[i].vigencias[j]);
-                                        const vigenciaFormatted = vigenciaDate.toISOString().split('T')[0];
-                                      %>
-                                      <input 
-                                        type="date" 
-                                        class="vigencia-input form-control" 
-                                        value="<%= vigenciaFormatted %>"
-                                        name="dataVigencia"
-                                      />
-                                    </div>
-                                    <div class="col-4">
-                                      <% 
-                                        // Formate a data/hora no formato AAAA-MM-DDTHH:MM
-                                        const movimentacaoDate = new Date(operadoras[i].movimentacao[j]);
-                                        const movimentacaoFormatted = movimentacaoDate.toISOString().slice(0, 16);
-                                      %>
-                                      <input 
-                                        type="datetime-local" 
-                                        class="movimentacao-input form-control"
-                                        value="<%= movimentacaoFormatted %>"
-                                        name="dataMovimentacao"
-                                      />
-                                    </div>
-                                    <div class="col-4">
-                                      <% 
-                                        // Formate a data/hora no formato AAAA-MM-DDTHH:MM
-                                        const fechamentoDate = new Date(operadoras[i].fechamentos[j]);
-                                        const fechamentoFormatted = fechamentoDate.toISOString().slice(0, 16);
-                                      %>
-                                      <input 
-                                        type="datetime-local" 
-                                        class="fechamento-input form-control"
-                                        value="<%= fechamentoFormatted %>"
-                                        name="dataFechamento"
-                                      />
-                                    </div>
-                                    <button 
-                                      type="button" 
-                                      class="excluir-btn btn btn-danger" 
-                                      title="Excluir vigência">
-                                      <i class="bi bi-x-circle"></i>
-                                    </button>
-                                  </div>
-                                <% } %>
-                                        <button type="button"  class="adicionarvigencia btn btn-secondary"><i class="bi bi-plus-circle"></i> Adicionar Vigência</button>
-                                <% } else { %>
-                                <p class="Sem-vigencias">Sem vigências disponíveis</p>
-                                <button type="button" class="adicionarvigencia btn btn-secondary"><i class="bi bi-plus-circle"></i> Adicionar Vigência</button>
-                            <% } %>                                
+                          <% if (operadoras[i].vigencias.length > 0) { %>
+                            <% for (let j = 0; j < operadoras[i].vigencias.length; j++) { %>
+                              <div class="row vigencia">
+                                <div class="col-4">
+                                  <% 
+                                    // Formate a data no formato AAAA-MM-DD
+                                    const vigenciaDate = new Date(operadoras[i].vigencias[j]);
+                                    const vigenciaFormatted = vigenciaDate.toISOString().split('T')[0];
+                                  %>
+                                  <input 
+                                    type="date" 
+                                    class="vigencia-input form-control" 
+                                    value="<%= vigenciaFormatted %>"
+                                    name="dataVigencia"
+                                  />
+                                </div>
+                                <div class="col-4">
+                                  <% 
+                                    // Formate a data/hora no formato AAAA-MM-DDTHH:MM em UTM -3
+                                    const movimentacaoDate = new Date(operadoras[i].movimentacao[j]);
+                                    movimentacaoDate.setUTCHours(movimentacaoDate.getUTCHours() - 3);
+                                    const movimentacaoFormatted = movimentacaoDate.toISOString().slice(0, 16);
+                                  %>
+                                  <input 
+                                    type="datetime-local" 
+                                    class="movimentacao-input form-control"
+                                    value="<%= movimentacaoFormatted %>"
+                                    name="dataMovimentacao"
+                                  />
+                                </div>
+                                <div class="col-4">
+                                  <% 
+                                    // Formate a data/hora no formato AAAA-MM-DDTHH:MM em UTM -3
+                                    const fechamentoDate = new Date(operadoras[i].fechamentos[j]);
+                                    fechamentoDate.setUTCHours(fechamentoDate.getUTCHours() - 3);
+                                    const fechamentoFormatted = fechamentoDate.toISOString().slice(0, 16);
+                                  %>
+                                  <input 
+                                    type="datetime-local" 
+                                    class="fechamento-input form-control"
+                                    value="<%= fechamentoFormatted %>"
+                                    name="dataFechamento"
+                                  />
+                                </div>
+                                <button 
+                                  type="button" 
+                                  class="excluir-btn btn btn-danger" 
+                                  title="Excluir vigência"
+                                >
+                                  <i class="bi bi-x-circle"></i>
+                                </button>
+                              </div>
+                            <% } %>
+                            <button type="button" class="adicionarvigencia btn btn-secondary">
+                              <i class="bi bi-plus-circle"></i> Adicionar Vigência
+                            </button>
+                          <% } else { %>
+                            <p class="Sem-vigencias">Sem vigências disponíveis</p>
+                            <button type="button" class="adicionarvigencia btn btn-secondary">
+                              <i class="bi bi-plus-circle"></i> Adicionar Vigência
+                            </button>
+                          <% } %>                                
                         </div>
-                    </div>
+                      </div>
+                      
                 </div>
             <% } %>
         </form>
@@ -139,23 +147,6 @@
             </div>
     </div>
     <script src="/js/vigencias.js"></script>
-    <script>
-        $(document).ready(function () {
-            $("#data-proxima-atualizacao").datepicker();
-            var dataAtual = new Date();
-            // Formata a data no formato DD/MM/AAAA
-            var dia = dataAtual.getDate().toString().padStart(2, '0');
-            var mes = (dataAtual.getMonth() + 1).toString().padStart(2, '0');
-            var ano = dataAtual.getFullYear();
-            var dataFormatada = dia + '/' + mes + '/' + ano;
-
-            // Define o valor do campo data-atualizacao
-            $('#data-atualizacao').val(dataFormatada);
-
-            // Desativa a edição do campo
-            $('#data-atualizacao').prop('readonly', true);
-        });
-    </script>
 </body>
 
 </html>

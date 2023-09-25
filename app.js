@@ -65,8 +65,8 @@ app.use(session({
 
 const db = mysql.createConnection({
     host: 'localhost',
-    user: 'midiaIdeal',
-    password: 'midia@8444',
+    user: 'root',
+    password: 'pmp078917',
     database: 'vigencias_db',
 	  port: '3306'
 });
