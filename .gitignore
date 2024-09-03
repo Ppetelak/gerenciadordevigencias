@@ -1,3 +1,5 @@
 node_modules/
 web.config
 index.cgi
+vigencias_db.sql
+database.js

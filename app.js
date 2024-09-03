@@ -521,7 +521,7 @@ app.post('/salvarLogo', async (req, res) => {
 /* Inicializando o servidor */
 
 app.listen(process.env.PORT || port, (req, res) =>{
-  console.log('Servidor rodando com sucesso na porta: 3000')
+  console.log(`Servidor rodando com sucesso na porta: ${port}`)
 });
 
 

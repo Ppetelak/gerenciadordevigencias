@@ -3,10 +3,10 @@ const mysql = require("promise-mysql");
 
 const configDev = {
   host: "pablopetelak.com",
-  user: "u654656997_dev",
+  user: "u654656997_vigencias_user",
   port: "3306",
-  password: "0Uc0d53^w",
-  database: "u654656997_mhvendasdev",
+  password: "pmpDevPablo@078917",
+  database: "u654656997_vigencias",
   waitForConnections: true,
   connectionLimit: 50, // Ajuste conforme necessário
   queueLimit: 0
@@ -23,7 +23,7 @@ const configProd = {
   queueLimit: 0
 }
 
-const config = configProd;
+const config = configDev;
 
 module.exports = {
   mysql,
