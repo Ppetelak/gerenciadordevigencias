@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquivo teste</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+</head>
+
+<body>
+    <div class="content">
+        <h1>Operadoras</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Logo</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Administradora</th>
+                    <th scope="col">Abrangência</th>
+                    <th scope="col">Área de Atuação</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="tbody-operadoras">
+                <tr>
+                    <th scope="row">0</th>
+                    <td class="td-1"><img src="./img-privadas/LOGO-OPERADORA-MODELO.png" class="editable-image"><button
+                            class="edit-image-btn btn btn-info"
+                            title="Editar logo da Operadora"><i class="bi bi-images"></i></button>
+                    </td>
+                    <td class="td-2"><input type="text" class="nome-operadora input form-control"
+                            placeholder="Insira o Nome da Operadora" data-field="nome">
+                        </span></td>
+                    <td class="td-3">
+                        <select class="nome-adm select form-control" data-field="administradora">
+                            <option value="Mount Hermon">Mount Hermon</option>
+                            <option value="Classe Administradora">Classe Administradora</option>
+                            <option value="Compar">Compar</option>
+                        </select>
+                    </td>
+                    <td class="td-4"><textarea class="abrangencia textarea form-control" data-field="abrangencia" placeholder="Insira a área de abrengência da operadora"></textarea>
+                        </td>
+                    <td class="td-5"><textarea class="areadeatuacao textarea form-control" data-field="areaAtuacao" placeholder="Insira a área de Atuação"></textarea></td>
+                    <td>
+                        <button class="cancel-btn btn btn-danger" title="Voltar sem salvar"><i
+                                class="bi bi-arrow-counterclockwise"></i></button>
+                        <button class="save-btn btn btn-success" title="Salvar alterações"><i
+                                class="bi bi-sd-card"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script src="/js/operadoras.js"></script>
+</body>
+
+</html>

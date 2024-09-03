@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualização - Publicação Vigências</title>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;800&display=swap" rel="stylesheet">
+
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/js/jquery.ui.datepicker-pt-BR.js"></script>
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+
+    <%- include('navbar') %>
+    <div class="alert alert-success alert-dismissible fade show fixed-top" role="alert" id="Message"
+        style="display:none">
+        Sucesso!
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show fixed-top" role="alert" id="MessageError"
+        style="display:none">
+        Erro!
+    </div>
+    <div class="content">
+        <div class="row cabecalho">
+            <h1>CONFERÊNCIA</h1>
+            <div class="col-3">
+                Operadora
+            </div>
+            <div class="col-3">
+                Vigência
+            </div>
+            <div class="col-3">
+                Movimentação
+            </div>
+            <div class="col-3">
+                Fechamento
+            </div>
+        </div>
+        <div class="row dados">
+            <% for (let i=0; i < operadoras.length; i++) { %>
+                <% if (operadoras[i].vigencias.length > 0 && operadoras[i].fechamentos.length > 0) { %>
+                    <div class="row operadora">
+                        <div class="col-3 img"> 
+                            <img class="img-fluid" src="<%= operadoras[i].logo %>">
+                        </div>
+                        <div class="col-9">
+                            <% for (let j = 0; j < operadoras[i].vigencias.length; j++) { %>
+                                <div class="row vigenciasLinha">
+                                    <div class="col-4">
+                                        <% // Check if the date data for vigencias is present before formatting and rendering %>
+                                        <% if (operadoras[i].vigencias[j]) { %>
+                                        <% // Convert the date string to a Date object for vigencias %>
+                                        <% const vigenciaDate = new Date(operadoras[i].vigencias[j]); %>
+                                        <% // Get the day, month, and year separately %>
+                                        <% const vigenciaDay = String(vigenciaDate.getDate()).padStart(2, '0'); %>
+                                        <% const vigenciaMonth = String(vigenciaDate.getMonth() + 1).padStart(2, '0'); %>
+                                        <% const vigenciaYear = String(vigenciaDate.getFullYear()).slice(-2); %>
+                                        <% // Create the formatted date string in the desired format for vigencias %>
+                                        <%= `${vigenciaDay}-${vigenciaMonth}-${vigenciaYear}` %>
+                                        <% } %>
+                                    </div>
+                                    <div class="col-4">
+                                        <% if (operadoras[i].movimentacoes[j]) { %>
+                                            <% const movimentacaoDate = new Date(operadoras[i].movimentacoes[j]); %>
+                                            <% const movimentacaoDay = String(movimentacaoDate.getDate()).padStart(2, '0'); %>
+                                            <% const movimentacaoMonth = String(movimentacaoDate.getMonth() + 1).padStart(2, '0'); %>
+                                            <% const movimentacaoYear = String(movimentacaoDate.getFullYear()).slice(-2); %>
+                                            <% const movimentacaoTime = movimentacaoDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }); %>
+                                            <%= `${movimentacaoDay}-${movimentacaoMonth}-${movimentacaoYear} até às ${movimentacaoTime}` %>
+                                        <% } %>
+                                    </div>
+                                    <div class="col-4">
+                                        <% if (operadoras[i].fechamentos[j]) { %>
+                                            <% const fechamentoDate = new Date(operadoras[i].fechamentos[j]); %>
+                                            <% const fechamentoDay = String(fechamentoDate.getDate()).padStart(2, '0'); %>
+                                            <% const fechamentoMonth = String(fechamentoDate.getMonth() + 1).padStart(2, '0'); %>
+                                            <% const fechamentoYear = String(fechamentoDate.getFullYear()).slice(-2); %>
+                                            <% const fechamentoTime = fechamentoDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }); %>
+                                            <%= `${fechamentoDay}-${fechamentoMonth}-${fechamentoYear} até às ${fechamentoTime}` %>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                <% } %>
+            <% } %>
+        </div>
+        <div class="footer">
+            <div class="row">
+                <h3> Publicação das informações </h3>
+                <div class="col-4">
+                    <label for="data-atualizacao">Data de atualização:</label> <br>
+                    <input type="text" id="data-atualizacao" class="data-atualizacao-input" readonly>
+                </div>
+                <div class="col-4">
+                    <label for="data-proxima-atualizacao">Data da próxima atualização:</label><br>
+                    <input type="text" id="data-proxima-atualizacao" class="data-proxima-atualizacao-input"
+                    placeholder="Insira a data" required>
+                </div>
+                <div class="col-4">
+                    <button type="button" class="update-btn btn btn-primary">Publicar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/salvarVigencias.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#data-proxima-atualizacao").datepicker();
+            var dataAtual = new Date();
+            // Formata a data no formato DD/MM/AAAA
+            var dia = dataAtual.getDate().toString().padStart(2, '0');
+            var mes = (dataAtual.getMonth() + 1).toString().padStart(2, '0');
+            var ano = dataAtual.getFullYear();
+            var dataFormatada = dia + '/' + mes + '/' + ano;
+
+            // Define o valor do campo data-atualizacao
+            $('#data-atualizacao').val(dataFormatada);
+
+            // Desativa a edição do campo
+            $('#data-atualizacao').prop('readonly', true);
+        });
+    </script>
+</body>

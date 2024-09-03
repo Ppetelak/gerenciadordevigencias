@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alteração Vigências</title>
+    <link rel="icon" type="image/png" href="/img-privadas/faviconlinhamasterv2.png">
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;800&display=swap" rel="stylesheet">
+
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/js/jquery.ui.datepicker-pt-BR.js"></script>
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <%- include('navbar') %>
+    <div class="alert alert-success alert-dismissible fade show fixed-top" role="alert" id="Message"
+        style="display:none">
+        Sucesso!
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show fixed-top" role="alert" id="MessageError"
+        style="display:none">
+        Erro!
+    </div>
+    <div class="content">        
+        <div class="row cabecalho">
+            <h1>Alteração de Vigências / Fechamentos</h1>
+            <div class="col-1">
+                Logo
+            </div>
+            <div class="col-2">
+                Nome
+            </div>
+            <div class="col-2">
+                Administradora
+            </div>
+            <div class="col-7">
+                Vigência - Movimentação - Fechamento
+            </div>
+        </div>
+        <form>
+            <% for (let i=0; i < operadoras.length; i++) { %>
+                <div class="row operadora">
+                    <input type="hidden" name="idOperadora" value="<%= operadoras[i].id %>" class="idOperadora">
+                    <div class="col-1 img">
+                        <img src="<%= operadoras[i].logo %>">
+                    </div>
+                    <div class="col-2">
+                        <%= operadoras[i].nome %>
+                    </div>
+                    <div class="col-2">
+                        <%= operadoras[i].administradora %>
+                    </div>
+                    <div class="col-7">
+                        <div class="row vigencias">
+                          <% if (operadoras[i].vigencias.length > 0) { %>
+                            <% for (let j = 0; j < operadoras[i].vigencias.length; j++) { %>
+                              <div class="row vigencia">
+                                <div class="col-4">
+                                  <% 
+                                    // Formate a data no formato AAAA-MM-DD
+                                    const vigenciaDate = new Date(operadoras[i].vigencias[j]);
+                                    const vigenciaFormatted = vigenciaDate.toISOString().split('T')[0];
+                                  %>
+                                  <input 
+                                    type="date" 
+                                    class="vigencia-input form-control" 
+                                    value="<%= vigenciaFormatted %>"
+                                    name="dataVigencia"
+                                  />
+                                </div>
+                                <div class="col-4">
+                                  <% 
+                                    // Formate a data/hora no formato AAAA-MM-DDTHH:MM em UTM -3
+                                    const movimentacaoDate = new Date(operadoras[i].movimentacao[j]);
+                                    movimentacaoDate.setUTCHours(movimentacaoDate.getUTCHours() - 3);
+                                    const movimentacaoFormatted = movimentacaoDate.toISOString().slice(0, 16);
+                                  %>
+                                  <input 
+                                    type="datetime-local" 
+                                    class="movimentacao-input form-control"
+                                    value="<%= movimentacaoFormatted %>"
+                                    name="dataMovimentacao"
+                                  />
+                                </div>
+                                <div class="col-4">
+                                  <% 
+                                    // Formate a data/hora no formato AAAA-MM-DDTHH:MM em UTM -3
+                                    const fechamentoDate = new Date(operadoras[i].fechamentos[j]);
+                                    fechamentoDate.setUTCHours(fechamentoDate.getUTCHours() - 3);
+                                    const fechamentoFormatted = fechamentoDate.toISOString().slice(0, 16);
+                                  %>
+                                  <input 
+                                    type="datetime-local" 
+                                    class="fechamento-input form-control"
+                                    value="<%= fechamentoFormatted %>"
+                                    name="dataFechamento"
+                                  />
+                                </div>
+                                <button 
+                                  type="button" 
+                                  class="excluir-btn btn btn-danger" 
+                                  title="Excluir vigência"
+                                >
+                                  <i class="bi bi-x-circle"></i>
+                                </button>
+                              </div>
+                            <% } %>
+                            <button type="button" class="adicionarvigencia btn btn-secondary">
+                              <i class="bi bi-plus-circle"></i> Adicionar Vigência
+                            </button>
+                          <% } else { %>
+                            <p class="Sem-vigencias">Sem vigências disponíveis</p>
+                            <button type="button" class="adicionarvigencia btn btn-secondary">
+                              <i class="bi bi-plus-circle"></i> Adicionar Vigência
+                            </button>
+                          <% } %>                                
+                        </div>
+                      </div>
+                      
+                </div>
+            <% } %>
+        </form>
+            <div class="row footer">
+                <div class="row">
+                    <h3> Salvar informações </h3>
+                    <div class="col-6">  
+                        <p> 
+                            Clique no botão para salvar as alterações realizadas até o momento, lembrando que não será publicado, apenas será publicado quando clicar no botão da seção abaixo em "Publicar"
+                            
+                        </p>
+                    </div>
+                    <div class="col-6"> 
+                        <button type="button" class="salvar-btn btn btn-primary">Salvar informações</button>
+                        <a href="/visualizar" target="_blank"><button type="button" class="btn btn-primary">Visualizar Prévia</button></a>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <script src="/js/vigencias.js"></script>
+</body>
+
+</html>

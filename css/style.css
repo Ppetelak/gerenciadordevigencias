@@ -1,0 +1,74 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #20325d;
+    background-image: url(/img-privadas/background.png);
+    background-repeat: no-repeat;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.container {
+    width: 30%;
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(109, 196, 253, 0.2);
+}
+
+.tituloGerenciador{
+    color:#ED7923;
+}
+
+.fixed-bottom {
+    background: linear-gradient(to right, #BF7D2A, #ED7923, #2BB3B1);
+    width: 100%;
+    height: 10px;
+}
+
+.btn-primary {
+    background-color: #20325d!important ;
+}
+
+.tablefooter {
+    margin-top: 20px;
+}
+
+.sidebar {
+    background-color: #333;
+    color: #fff;
+    height: 100vh;
+    width: 300px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar a {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px;
+    text-align: center;
+}
+
+.sidebar a:hover {
+    background-color: #555;
+}
+
+.content {
+    margin-left: 300px;
+    padding: 20px;
+}
