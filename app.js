@@ -4,6 +4,7 @@ const {
 } = require("./database");
 const express = require('express');
 const app = new express();
+const axios = require('axios');
 const path = require('path')
 const session = require('express-session');
 //const redis = require('connect-redis');
@@ -65,6 +66,17 @@ app.use(session({
     }
   }));
 
+async function enviarErroDiscord(mensagem) {
+  let enviar = `ERRO VIGÊNCIAS LINHA MASTER: \n
+  ${mensagem}`
+  try {
+    await axios.post('https://bot.midiaideal.com/mensagem-erros', { enviar });
+    console.log('Mensagem enviada com sucesso');
+  } catch (error) {
+      console.error('Erro ao enviar mensagem erro:', error);
+  }
+}
+
 
 /* Rota de logout do aplicativo */
 
@@ -96,6 +108,7 @@ app.post('/login-verifica', async (req, res) => {
     const query = 'SELECT * FROM users WHERE nomedesusuario = ?';
     db.query(query, [username], (err, results) => {
       if (err) {
+        enviarErroDiscord(err)
         console.error('Erro ao consultar o banco de dados:', err);
         return res.status(500).json({ error: 'Erro ao processar a solicitação' });
       }
@@ -122,9 +135,11 @@ app.get('/rotateste', verificaAutenticacao , (req, res) => {
 
 app.get('/vigencias', verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
-  const query = 'SELECT * FROM operadoras';
-  db.query(query, (err, operadoras) => {
+  try {
+    const query = 'SELECT * FROM operadoras';
+    db.query(query, (err, operadoras) => {
     if (err) {
+      enviarErroDiscord(err)
       console.error('Erro ao consultar o banco de dados:', err);
       res.status(500).send('Erro ao processar a solicitação');
       return;
@@ -155,219 +170,263 @@ app.get('/vigencias', verificaAutenticacao, async (req, res) => {
         res.render('vigencias', { operadoras });
       })
       .catch((error) => {
+        enviarErroDiscord(err)
         console.error('Erro ao consultar o banco de dados:', error);
         res.status(500).send('Erro ao processar a solicitação');
       });
   });
+  } catch (error) {
+    enviarErroDiscord(error)
+    console.error(error);
+    res.status(500).send('Erro ao carregar os dados.');
+  }  
 });
 
 app.get('/operadoras', verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
-  const query = 'SELECT * FROM operadoras';
-  const files = fs.readdirSync('img/');
-  db.query(query, (err, operadoras) => {
-    if (err) {
-      console.error('Erro ao consultar o banco de dados:', err);
-      res.status(500).send('Erro ao processar a solicitação');
-      return;
-    }
-    res.render('operadoras', {operadoras, files:files});
-  });
+  try {
+    const query = 'SELECT * FROM operadoras';
+    const files = fs.readdirSync('img/');
+    db.query(query, (err, operadoras) => {
+      if (err) {
+        enviarErroDiscord(err)
+        console.error('Erro ao consultar o banco de dados:', err);
+        res.status(500).send('Erro ao processar a solicitação');
+        return;
+      }
+      res.render('operadoras', {operadoras, files:files});
+    });
+  } catch (error) {
+    enviarErroDiscord(error)
+    console.error(error);
+    res.status(500).send('Erro ao carregar os dados.');
+  }    
 })
 
 app.post('/salvar-infos', async (req, res) => {
   const db = await mysql.createPool(config);
-  const { vigencias } = req.body;
-
-  const sqlExcluirVigencias = 'TRUNCATE TABLE vigencias_temp';
-  const sqlSalvarVigencias = 'INSERT INTO vigencias_temp (idOperadora, dataVigencia, dataMovimentacao, dataFechamento) VALUES (?, ?, ?, ?)';
-
-
-  db.query(sqlExcluirVigencias, (err, resultExc) => {
-    if(err){
-      console.error('Erro na exclusão das vigencias já cadastradas')
-      res.cookie('alertError', 'Erro ao SALVAR vigências, verifique e tente novamente', { maxAge: 3000 });
-      res.status(500).json({ message: 'Erro interno do servidor' });
-    }
-    if(Array.isArray(vigencias)) {
-      vigencias.forEach((vigencia) => {
-        db.query(sqlSalvarVigencias, [vigencia.idOperadora, vigencia.dataVigencia,vigencia.dataMovimentacao, vigencia.dataFechamento],(err, result) => {
-          if(err){
-            console.error('Erro ao cadastrar as vigências na tela temporária', err) 
-          }
+  try {
+    const { vigencias } = req.body;
+    console.log(vigencias);
+  
+  
+    const sqlExcluirVigencias = 'TRUNCATE TABLE vigencias_temp';
+    const sqlSalvarVigencias = 'INSERT INTO vigencias_temp (idOperadora, dataVigencia, dataMovimentacao, dataFechamento) VALUES (?, ?, ?, ?)';
+  
+  
+    db.query(sqlExcluirVigencias, (err, resultExc) => {
+      if(err){
+        console.error('Erro na exclusão das vigencias já cadastradas')
+        res.cookie('alertError', 'Erro ao SALVAR vigências, verifique e tente novamente', { maxAge: 3000 });
+        res.status(500).json({ message: 'Erro interno do servidor' });
+      }
+      if(Array.isArray(vigencias)) {
+        vigencias.forEach((vigencia) => {
+          db.query(sqlSalvarVigencias, [vigencia.idOperadora, vigencia.dataVigencia,vigencia.dataMovimentacao, vigencia.dataFechamento],(err, result) => {
+            if(err){
+              console.error('Erro ao cadastrar as vigências na tela temporária', err) 
+            }
+          })
         })
-      })
-    }
-    res.cookie('alertSucess', 'Dados de Vigências SALVOS com sucesso!', { maxAge: 3000 })
-    res.status(200).json({ message: 'Dados de Vigências SALVOS com sucesso!' });
-    //console.log('Dados salvos:', vigencias)
-  });
+      }
+      res.cookie('alertSucess', 'Dados de Vigências SALVOS com sucesso!', { maxAge: 3000 })
+      res.status(200).json({ message: 'Dados de Vigências SALVOS com sucesso!' });
+      //console.log('Dados salvos:', vigencias)
+    });
+  } catch (error) {
+    enviarErroDiscord(error)
+    console.error(error);
+    res.status(500).send('Erro ao carregar os dados.');
+  }  
 })
 
 app.get('/visualizar', async (req,res) => {
   const db = await mysql.createPool(config);
-  const query = 'SELECT o.id, o.logo, o.abrangencia, o.areadeatuacao, o.nome, o.administradora, v.dataVigencia, v.dataMovimentacao, v.dataFechamento FROM operadoras o LEFT JOIN vigencias_temp v ON o.id = v.idOperadora';
-  db.query(query, (err, resultados) => {
-    if (err) {
-      console.error('Erro ao consultar o banco de dados:', err);
-      res.status(500).send('Erro ao processar a solicitação');
-      return;
-    }
-
-    const operadoras = [];
-
-    // Agrupar os resultados por ID da operadora
-    const operadorasMap = new Map();
-    resultados.forEach((resultado) => {
-      const operadoraId = resultado.id;
-      if (!operadorasMap.has(operadoraId)) {
-        // Criar um novo objeto de operadora
-        const operadora = {
-          id: operadoraId,
-          logo: resultado.logo,
-          abrangencia: resultado.abrangencia,
-          areaAtuacao: resultado.areadeatuacao,
-          nome: resultado.nome,
-          administradora: resultado.administradora,
-          vigencias: [],
-          movimentacoes: [],
-          fechamentos: []
-        };
-        operadorasMap.set(operadoraId, operadora);
-        operadoras.push(operadora);
-      }
-
-      // Adicionar vigência e fechamento à operadora correspondente
-      const operadora = operadorasMap.get(operadoraId);
-      operadora.vigencias.push(resultado.dataVigencia);
-      operadora.movimentacoes.push(resultado.dataMovimentacao);
-      operadora.fechamentos.push(resultado.dataFechamento);
-    });
-
-    const queryInformacoesGerais = 'SELECT data_atualizacao, data_proxima_atualizacao FROM informacoes_gerais ORDER BY id DESC LIMIT 1';
-    db.query(queryInformacoesGerais, (err, resultadoInformacoesGerais) => {
+  try {
+    const query = 'SELECT o.id, o.logo, o.abrangencia, o.areadeatuacao, o.nome, o.administradora, v.dataVigencia, v.dataMovimentacao, v.dataFechamento FROM operadoras o LEFT JOIN vigencias_temp v ON o.id = v.idOperadora';
+    db.query(query, (err, resultados) => {
       if (err) {
-        console.error('Erro ao consultar as informações gerais:', err);
+        enviarErroDiscord(err)
+        console.error('Erro ao consultar o banco de dados:', err);
         res.status(500).send('Erro ao processar a solicitação');
         return;
       }
-
-      // Verificar se há resultados
-      if (resultadoInformacoesGerais.length === 0) {
-        res.status(404).send('Nenhuma informação encontrada');
-        return;
-      }
-
-      const informacoesGerais = resultadoInformacoesGerais[0];
-
-      res.render('visualizacaocalendario', { operadoras, informacoesGerais });
-      //console.log(operadoras)
+  
+      const operadoras = [];
+  
+      // Agrupar os resultados por ID da operadora
+      const operadorasMap = new Map();
+      resultados.forEach((resultado) => {
+        const operadoraId = resultado.id;
+        if (!operadorasMap.has(operadoraId)) {
+          // Criar um novo objeto de operadora
+          const operadora = {
+            id: operadoraId,
+            logo: resultado.logo,
+            abrangencia: resultado.abrangencia,
+            areaAtuacao: resultado.areadeatuacao,
+            nome: resultado.nome,
+            administradora: resultado.administradora,
+            vigencias: [],
+            movimentacoes: [],
+            fechamentos: []
+          };
+          operadorasMap.set(operadoraId, operadora);
+          operadoras.push(operadora);
+        }
+  
+        // Adicionar vigência e fechamento à operadora correspondente
+        const operadora = operadorasMap.get(operadoraId);
+        operadora.vigencias.push(resultado.dataVigencia);
+        operadora.movimentacoes.push(resultado.dataMovimentacao);
+        operadora.fechamentos.push(resultado.dataFechamento);
+      });
+  
+      const queryInformacoesGerais = 'SELECT data_atualizacao, data_proxima_atualizacao FROM informacoes_gerais ORDER BY id DESC LIMIT 1';
+      db.query(queryInformacoesGerais, (err, resultadoInformacoesGerais) => {
+        if (err) {
+          enviarErroDiscord(err)
+          console.error('Erro ao consultar as informações gerais:', err);
+          res.status(500).send('Erro ao processar a solicitação');
+          return;
+        }
+  
+        // Verificar se há resultados
+        if (resultadoInformacoesGerais.length === 0) {
+          res.status(404).send('Nenhuma informação encontrada');
+          return;
+        }
+  
+        const informacoesGerais = resultadoInformacoesGerais[0];
+  
+        res.render('visualizacaocalendario', { operadoras, informacoesGerais });
+        //console.log(operadoras)
+      });
     });
-  });
+  } catch (error) {
+    enviarErroDiscord(error)
+    console.error(error);
+    res.status(500).send('Erro ao carregar os dados.');
+  }  
 })
 
 app.post('/copiar-dados', async (req, res) => {
   const db = await mysql.createPool(config);
-  const { dataAtualizacao, dataProximaAtualizacao } = req.body;
-
-  const [diaAtualizacao, mesAtualizacao, anoAtualizacao] = dataAtualizacao.split('/');
-  const dataAtualizacaoFormatada = `${anoAtualizacao}-${mesAtualizacao}-${diaAtualizacao}`;
-
-  const [diaProxima, mesProxima, anoProxima] = dataProximaAtualizacao.split('/');
-  const dataProximaAtualizacaoFormatada = `${anoProxima}-${mesProxima}-${diaProxima}`;
-
-  const queryDelete = 'TRUNCATE TABLE vigencias';
-  const query = 'INSERT INTO vigencias SELECT * FROM vigencias_temp';
-  const queryInfos = 'INSERT INTO informacoes_gerais (data_atualizacao, data_proxima_atualizacao) VALUES (?, ?)'
+  try {
+    const { dataAtualizacao, dataProximaAtualizacao } = req.body;
   
-  db.query(queryDelete, (err, result) => {
-    if (err) {
-      console.error('Erro ao excluir dados da tabela de vigências', err);
-      res.status(500).json({ error: 'Erro ao excluir dados da tabela de vigências' });
-    } else {
-      db.query(query, (err, result) => {
-        if (err) {
-          console.error('Erro ao salvar Publicar as informações', err);
-          res.status(500).json({ error: 'Erro ao salvar Publicar as informações' });
-        } else {
-          db.query(queryInfos, [dataAtualizacaoFormatada, dataProximaAtualizacaoFormatada], (err, result) => {
-            if (err) {
-              console.error('Erro ao copiar as informações para a tabela de vigências', err);
-              res.status(500).json({ error: 'Erro ao copiar as informações para a tabela de vigências' });
-            } else {
-              res.cookie('alertSucess', 'Dados de Vigências PUBLICADOS com sucesso!', { maxAge: 3000 });
-              res.status(200).json({ message: 'Vigências PUBLICADAS com sucesso!' });
-            }
-          });
-        }
-      });
-    }
-  });
+    const [diaAtualizacao, mesAtualizacao, anoAtualizacao] = dataAtualizacao.split('/');
+    const dataAtualizacaoFormatada = `${anoAtualizacao}-${mesAtualizacao}-${diaAtualizacao}`;
+  
+    const [diaProxima, mesProxima, anoProxima] = dataProximaAtualizacao.split('/');
+    const dataProximaAtualizacaoFormatada = `${anoProxima}-${mesProxima}-${diaProxima}`;
+  
+    const queryDelete = 'TRUNCATE TABLE vigencias';
+    const query = 'INSERT INTO vigencias SELECT * FROM vigencias_temp';
+    const queryInfos = 'INSERT INTO informacoes_gerais (data_atualizacao, data_proxima_atualizacao) VALUES (?, ?)'
+    
+    db.query(queryDelete, (err, result) => {
+      if (err) {
+        enviarErroDiscord(err)
+        console.error('Erro ao excluir dados da tabela de vigências', err);
+        res.status(500).json({ error: 'Erro ao excluir dados da tabela de vigências' });
+      } else {
+        db.query(query, (err, result) => {
+          if (err) {
+            enviarErroDiscord(err)
+            console.error('Erro ao salvar Publicar as informações', err);
+            res.status(500).json({ error: 'Erro ao salvar Publicar as informações' });
+          } else {
+            db.query(queryInfos, [dataAtualizacaoFormatada, dataProximaAtualizacaoFormatada], (err, result) => {
+              if (err) {
+                enviarErroDiscord(err)
+                console.error('Erro ao copiar as informações para a tabela de vigências', err);
+                res.status(500).json({ error: 'Erro ao copiar as informações para a tabela de vigências' });
+              } else {
+                res.cookie('alertSucess', 'Dados de Vigências PUBLICADOS com sucesso!', { maxAge: 3000 });
+                res.status(200).json({ message: 'Vigências PUBLICADAS com sucesso!' });
+              }
+            });
+          }
+        });
+      }
+    });
+  } catch (error) {
+    enviarErroDiscord(error)
+    console.error(error);
+    res.status(500).send('Erro ao carregar os dados.');
+  }  
 });
 
 app.post('/operadoras-update',  async (req, res) => {
   const db = await mysql.createPool(config);
-  const { id, nome, administradora, abrangencia, areaAtuacao } = req.body;
-
-  // Consultar o banco de dados para verificar se o ID já existe
-  const query = 'SELECT * FROM operadoras WHERE id = ?';
-  db.query(query, [id], (err, rows) => {
-    if (err) {
-      console.error('Erro ao consultar operadora:', err);
-      return res.status(500).json({ message: 'Erro interno do servidor' });
-    }
-
-    if (rows.length > 0) {
-      // O ID existe, realizar a atualização
-      // Iniciar uma transação
-      db.beginTransaction((err) => {
-        if (err) {
-          console.error('Erro ao iniciar a transação:', err);
-          return res.status(500).json({ message: 'Erro interno do servidor' });
-        }
-
-        const updateQuery = 'UPDATE operadoras SET nome = ?, administradora = ?, abrangencia = ?, areadeatuacao = ? WHERE id = ?';
-        db.query(updateQuery, [nome, administradora, abrangencia, areaAtuacao, id], (err, result) => {
+  try {
+    const { id, nome, administradora, abrangencia, areaAtuacao } = req.body;
+  
+    // Consultar o banco de dados para verificar se o ID já existe
+    const query = 'SELECT * FROM operadoras WHERE id = ?';
+    db.query(query, [id], (err, rows) => {
+      if (err) {
+        console.error('Erro ao consultar operadora:', err);
+        return res.status(500).json({ message: 'Erro interno do servidor' });
+      }
+  
+      if (rows.length > 0) {
+        // O ID existe, realizar a atualização
+        // Iniciar uma transação
+        db.beginTransaction((err) => {
           if (err) {
-            console.error('Erro ao atualizar operadora:', err);
-
-            // Reverter a transação em caso de erro
-            db.rollback(() => {
-              console.error('Transação revertida.');
-              return res.status(500).json({ message: 'Erro interno do servidor' });
-            });
+            console.error('Erro ao iniciar a transação:', err);
+            return res.status(500).json({ message: 'Erro interno do servidor' });
           }
-
-          // Confirmar a transação
-          db.commit((err) => {
+  
+          const updateQuery = 'UPDATE operadoras SET nome = ?, administradora = ?, abrangencia = ?, areadeatuacao = ? WHERE id = ?';
+          db.query(updateQuery, [nome, administradora, abrangencia, areaAtuacao, id], (err, result) => {
             if (err) {
-              console.error('Erro ao confirmar a transação:', err);
-
+              console.error('Erro ao atualizar operadora:', err);
+  
               // Reverter a transação em caso de erro
               db.rollback(() => {
                 console.error('Transação revertida.');
                 return res.status(500).json({ message: 'Erro interno do servidor' });
               });
             }
-
-            // Transação bem-sucedida
-            res.status(200).json({ message: 'Operadora atualizada com sucesso' });
+  
+            // Confirmar a transação
+            db.commit((err) => {
+              if (err) {
+                console.error('Erro ao confirmar a transação:', err);
+  
+                // Reverter a transação em caso de erro
+                db.rollback(() => {
+                  console.error('Transação revertida.');
+                  return res.status(500).json({ message: 'Erro interno do servidor' });
+                });
+              }
+  
+              // Transação bem-sucedida
+              res.status(200).json({ message: 'Operadora atualizada com sucesso' });
+            });
           });
         });
-      });
-    } else {
-      // O ID não existe, criar uma nova operadora
-      const createQuery = 'INSERT INTO operadoras (nome, administradora, abrangencia, areadeatuacao) VALUES (?, ?, ?, ?)';
-      db.query(createQuery, [nome, administradora, abrangencia, areaAtuacao], (err, result) => {
-        if (err) {
-          console.error('Erro ao criar operadora:', err);
-          return res.status(500).json({ message: 'Erro interno do servidor' });
-        }
-        res.cookie('alertSucess', 'Operadora criada com Sucesso', { maxAge: 3000 });
-        res.status(200).json({ message: 'Nova operadora criada com sucesso' });
-      });
-    }
-  });
+      } else {
+        // O ID não existe, criar uma nova operadora
+        const createQuery = 'INSERT INTO operadoras (nome, administradora, abrangencia, areadeatuacao) VALUES (?, ?, ?, ?)';
+        db.query(createQuery, [nome, administradora, abrangencia, areaAtuacao], (err, result) => {
+          if (err) {
+            console.error('Erro ao criar operadora:', err);
+            return res.status(500).json({ message: 'Erro interno do servidor' });
+          }
+          res.cookie('alertSucess', 'Operadora criada com Sucesso', { maxAge: 3000 });
+          res.status(200).json({ message: 'Nova operadora criada com sucesso' });
+        });
+      }
+    });
+  } catch (error) {
+    enviarErroDiscord(error)
+    console.error(error);
+    res.status(500).send('Erro ao carregar os dados.');
+  }  
 });
 
 app.post('/upload', upload.single('file'), (req, res) => {
@@ -392,32 +451,38 @@ app.post('/deleteImage', (req, res) => {
 
 app.post('/excluir-operadora', async (req, res) => {
   const db = await mysql.createPool(config);
-  const { id, senha } = req.body;
-
-  // Verifique a senha digitada
-  if (senha === 'MountHermonDir') { // Substitua 'senha_correta' pela senha correta que você deseja verificar
-    // Realize a exclusão da operadora no banco de dados
-    db.query('DELETE FROM operadoras WHERE id = ?', [id], (err, result) => {
-      if (err) {
-        console.error('Erro ao excluir operadora:', err);
-        return res.status(500).json({ message: 'Erro interno do servidor ao excluir operadora' });
-      }
-
-      // Verifique se a operadora foi excluída com sucesso
-      if (result.affectedRows > 0) {
-        // A operadora foi excluída com sucesso
-        res.cookie('alertSucess', 'Operadora excluída com sucesso', { maxAge: 3000 });
-        res.redirect('/operadoras');
-      } else {
-        // A operadora com o ID especificado não foi encontrada
-        res.cookie('alertError', '❌❌❌ Operadora não encontrada ❌❌❌', { maxAge: 3000 });
-        return res.status(404).json({ message: 'Operadora não encontrada' });
-      }
-    });
-  } else {
-    // Envie uma resposta de erro
-    res.status(401).json({ message: 'Senha incorreta. Operação de exclusão não autorizada.' });
-  }
+  try {
+    const { id, senha } = req.body;
+  
+    // Verifique a senha digitada
+    if (senha === 'MountHermonDir') { // Substitua 'senha_correta' pela senha correta que você deseja verificar
+      // Realize a exclusão da operadora no banco de dados
+      db.query('DELETE FROM operadoras WHERE id = ?', [id], (err, result) => {
+        if (err) {
+          console.error('Erro ao excluir operadora:', err);
+          return res.status(500).json({ message: 'Erro interno do servidor ao excluir operadora' });
+        }
+  
+        // Verifique se a operadora foi excluída com sucesso
+        if (result.affectedRows > 0) {
+          // A operadora foi excluída com sucesso
+          res.cookie('alertSucess', 'Operadora excluída com sucesso', { maxAge: 3000 });
+          res.redirect('/operadoras');
+        } else {
+          // A operadora com o ID especificado não foi encontrada
+          res.cookie('alertError', '❌❌❌ Operadora não encontrada ❌❌❌', { maxAge: 3000 });
+          return res.status(404).json({ message: 'Operadora não encontrada' });
+        }
+      });
+    } else {
+      // Envie uma resposta de erro
+      res.status(401).json({ message: 'Senha incorreta. Operação de exclusão não autorizada.' });
+    }
+  } catch (error) {
+    enviarErroDiscord(error)
+    console.error(error);
+    res.status(500).send('Erro ao carregar os dados.');
+  }  
 });
 
 /* rota pública */
@@ -427,6 +492,7 @@ app.get('/', async (req, res) => {
   const query = 'SELECT o.id, o.logo, o.abrangencia, o.areadeatuacao, o.nome, o.administradora, v.dataVigencia, v.dataMovimentacao, v.dataFechamento FROM operadoras o LEFT JOIN vigencias v ON o.id = v.idOperadora';
   db.query(query, (err, resultados) => {
     if (err) {
+      enviarErroDiscord(err)
       console.error('Erro ao consultar o banco de dados:', err);
       res.status(500).send('Erro ao processar a solicitação');
       return;
@@ -465,6 +531,7 @@ app.get('/', async (req, res) => {
     const queryInformacoesGerais = 'SELECT data_atualizacao, data_proxima_atualizacao FROM informacoes_gerais ORDER BY id DESC LIMIT 1';
     db.query(queryInformacoesGerais, (err, resultadoInformacoesGerais) => {
       if (err) {
+        enviarErroDiscord(err)
         console.error('Erro ao consultar as informações gerais:', err);
         res.status(500).send('Erro ao processar a solicitação');
         return;
@@ -486,36 +553,42 @@ app.get('/', async (req, res) => {
 
 app.post('/salvarLogo', async (req, res) => {
   const db = await mysql.createPool(config);
-  const logo = req.body.logoUrl
-  const operadoraId = req.body.operadoraId
-  const query = 'UPDATE operadoras SET logo = ? WHERE id = ?';
-  db.query(query, [logo, operadoraId], (err, result) => {
-    if (err) {
-      console.error('Erro ao atualizar operadora:', err);
-
-      // Reverter a transação em caso de erro
-      db.rollback(() => {
-        console.error('Transação revertida.');
-        return res.status(500).json({ message: 'Erro interno do servidor' });
-      });
-    }
-
-    // Confirmar a transação
-    db.commit((err) => {
+  try {
+    const logo = req.body.logoUrl
+    const operadoraId = req.body.operadoraId
+    const query = 'UPDATE operadoras SET logo = ? WHERE id = ?';
+    db.query(query, [logo, operadoraId], (err, result) => {
       if (err) {
-        console.error('Erro ao confirmar a transação:', err);
-
+        console.error('Erro ao atualizar operadora:', err);
+  
         // Reverter a transação em caso de erro
         db.rollback(() => {
           console.error('Transação revertida.');
           return res.status(500).json({ message: 'Erro interno do servidor' });
         });
       }
-
-      res.cookie('alerta', '✅ Logo da operadora atualizado com SUCESSO', { maxAge: 3000 });
-      res.status(200).json({ message: 'Operadora atualizada com sucesso' });
+  
+      // Confirmar a transação
+      db.commit((err) => {
+        if (err) {
+          console.error('Erro ao confirmar a transação:', err);
+  
+          // Reverter a transação em caso de erro
+          db.rollback(() => {
+            console.error('Transação revertida.');
+            return res.status(500).json({ message: 'Erro interno do servidor' });
+          });
+        }
+  
+        res.cookie('alerta', '✅ Logo da operadora atualizado com SUCESSO', { maxAge: 3000 });
+        res.status(200).json({ message: 'Operadora atualizada com sucesso' });
+      });
     });
-  });
+  } catch (error) {
+    enviarErroDiscord(error)
+    console.error(error);
+    res.status(500).send('Erro ao carregar os dados.');
+  }  
 });
 
 /* Inicializando o servidor */

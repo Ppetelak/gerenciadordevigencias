@@ -1,5 +1,5 @@
 node_modules/
+database.js
 web.config
 index.cgi
 vigencias_db.sql
-database.js

@@ -40,9 +40,10 @@ $('.salvar-btn').on('click', function () {
             body: JSON.stringify({ vigencias })
         }).then((response) => {
             if (response.ok) {
+                window.location.href = '/visualizar'
                 // Recarrega a página antes de mostrar a mensagem
-                location.reload();
-                return response.json(); // Parse a resposta JSON
+                //location.reload();
+                //return response.json(); // Parse a resposta JSON
             } else {
                 alert('Erro ao SALVAR valores. Por favor, tente novamente.');
                 throw new Error('Erro na requisição'); // Lança um erro para cair no bloco catch
