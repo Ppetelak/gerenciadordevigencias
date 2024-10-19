@@ -26,10 +26,10 @@ $('.update-btn').on('click', function () {
         }
     }).then((data) => {
         console.log('Sucesso:', data.message); // Aqui você pode acessar a mensagem
-        showMessage(data.message); // Exibe a mensagem para o usuário
+        showMessage(data.message)// Exibe a mensagem para o usuário
     }).catch((error) => {
         console.log('Erro ao enviar os dados:', error);
-        alert('Erro ao enviar os dados. Por favor, tente novamente.');
+        alert('Erro ao enviar os dados. Por favor, tente novamente.' + error);
     });
 })
 

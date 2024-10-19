@@ -194,7 +194,16 @@ app.get('/operadoras', verificaAutenticacao, async (req, res) => {
         res.status(500).send('Erro ao processar a solicitação');
         return;
       }
-      res.render('operadoras', {operadoras, files:files});
+      res.render('operadoras', 
+        {
+          operadoras, 
+          files: files, 
+          administradoras: [
+            "Mount Hermon",
+            "Classe Administradora",
+            "Compar"
+          ]
+        });
     });
   } catch (error) {
     enviarErroDiscord(error)
@@ -359,69 +368,84 @@ app.post('/copiar-dados', async (req, res) => {
 });
 
 app.post('/operadoras-update',  async (req, res) => {
-  const db = await mysql.createPool(config);
+  const pool = await mysql.createPool(config);
   try {
     const { id, nome, administradora, abrangencia, areaAtuacao } = req.body;
-  
-    // Consultar o banco de dados para verificar se o ID já existe
-    const query = 'SELECT * FROM operadoras WHERE id = ?';
-    db.query(query, [id], (err, rows) => {
-      if (err) {
-        console.error('Erro ao consultar operadora:', err);
-        return res.status(500).json({ message: 'Erro interno do servidor' });
-      }
-  
-      if (rows.length > 0) {
-        // O ID existe, realizar a atualização
-        // Iniciar uma transação
-        db.beginTransaction((err) => {
-          if (err) {
-            console.error('Erro ao iniciar a transação:', err);
-            return res.status(500).json({ message: 'Erro interno do servidor' });
-          }
-  
-          const updateQuery = 'UPDATE operadoras SET nome = ?, administradora = ?, abrangencia = ?, areadeatuacao = ? WHERE id = ?';
-          db.query(updateQuery, [nome, administradora, abrangencia, areaAtuacao, id], (err, result) => {
+    
+
+      pool.getConnection((err, db) => {
+        if (err) {
+          console.error('Erro ao pegar conexão:', err);
+          return res.status(500).json({ message: 'Erro interno do servidor' });
+        }
+      // Consultar o banco de dados para verificar se o ID já existe
+      const query = 'SELECT * FROM operadoras WHERE id = ?';
+      db.query(query, [id], (err, rows) => {
+        if (err) {
+          console.error('Erro ao consultar operadora:', err);
+          return res.status(500).json({ message: 'Erro interno do servidor' });
+        }
+    
+        if (rows.length > 0) {
+          // O ID existe, realizar a atualização
+          // Iniciar uma transação
+          db.beginTransaction((err) => {
             if (err) {
-              console.error('Erro ao atualizar operadora:', err);
-  
-              // Reverter a transação em caso de erro
-              db.rollback(() => {
-                console.error('Transação revertida.');
-                return res.status(500).json({ message: 'Erro interno do servidor' });
-              });
+              console.error('Erro ao iniciar a transação:', err);
+              return res.status(500).json({ message: 'Erro interno do servidor' });
             }
-  
-            // Confirmar a transação
-            db.commit((err) => {
+
+            console.log({
+              id: id,
+              nomeOpweradora: nome,
+              administradora: administradora,
+              abrangencia: abrangencia,
+              areaAtuacao: areaAtuacao
+            })
+    
+            const updateQuery = 'UPDATE operadoras SET nome = ?, administradora = ?, abrangencia = ?, areadeatuacao = ? WHERE id = ?';
+            db.query(updateQuery, [nome, administradora, abrangencia, areaAtuacao, id], (err, result) => {
               if (err) {
-                console.error('Erro ao confirmar a transação:', err);
-  
+                console.error('Erro ao atualizar operadora:', err);
+    
                 // Reverter a transação em caso de erro
                 db.rollback(() => {
                   console.error('Transação revertida.');
                   return res.status(500).json({ message: 'Erro interno do servidor' });
                 });
               }
-  
-              // Transação bem-sucedida
-              res.status(200).json({ message: 'Operadora atualizada com sucesso' });
+    
+              // Confirmar a transação
+              db.commit((err) => {
+                if (err) {
+                  console.error('Erro ao confirmar a transação:', err);
+    
+                  // Reverter a transação em caso de erro
+                  db.rollback(() => {
+                    console.error('Transação revertida.');
+                    return res.status(500).json({ message: 'Erro interno do servidor' });
+                  });
+                }
+    
+                // Transação bem-sucedida
+                res.status(200).json({ message: 'Operadora atualizada com sucesso' });
+              });
             });
           });
-        });
-      } else {
-        // O ID não existe, criar uma nova operadora
-        const createQuery = 'INSERT INTO operadoras (nome, administradora, abrangencia, areadeatuacao) VALUES (?, ?, ?, ?)';
-        db.query(createQuery, [nome, administradora, abrangencia, areaAtuacao], (err, result) => {
-          if (err) {
-            console.error('Erro ao criar operadora:', err);
-            return res.status(500).json({ message: 'Erro interno do servidor' });
-          }
-          res.cookie('alertSucess', 'Operadora criada com Sucesso', { maxAge: 3000 });
-          res.status(200).json({ message: 'Nova operadora criada com sucesso' });
-        });
-      }
-    });
+        } else {
+          // O ID não existe, criar uma nova operadora
+          const createQuery = 'INSERT INTO operadoras (nome, administradora, abrangencia, areadeatuacao) VALUES (?, ?, ?, ?)';
+          db.query(createQuery, [nome, administradora, abrangencia, areaAtuacao], (err, result) => {
+            if (err) {
+              console.error('Erro ao criar operadora:', err);
+              return res.status(500).json({ message: 'Erro interno do servidor' });
+            }
+            res.cookie('alertSucess', 'Operadora criada com Sucesso', { maxAge: 3000 });
+            res.status(200).json({ message: 'Nova operadora criada com sucesso' });
+          });
+        }
+      });
+  });
   } catch (error) {
     enviarErroDiscord(error)
     console.error(error);

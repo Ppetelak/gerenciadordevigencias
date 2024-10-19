@@ -1,6 +1,6 @@
 var operadoraId = 1;
 
-function enableEdit(row, AdmDefault) {
+/* function enableEdit(row, AdmDefault) {
     row.find('.edit-btn').hide();
     row.find('.cancel-btn').show();
     row.find('.save-btn').show();
@@ -158,25 +158,125 @@ function updateOperadora(row) {
             console.error('Erro ao atualizar operadora:', error);
         }
     });
+} */
+
+function updateOperadora($row, operadoraId) {
+    // Coleta os dados editados
+    var nome = $row.find(".nome-operadora").text().trim().replace(/\s+/g, ' ');
+    var administradora = $row.find(".admin-select").val().trim().replace(/\s+/g, ' ');
+    var abrangencia = $row.find(".abrangencia").text().trim().replace(/\s+/g, ' ');
+    var areaAtuacao = $row.find(".link-edit").val(); // Pega o valor editado do campo de link
+
+    console.log({
+        id: operadoraId,
+        nome: nome,
+        administradora: administradora,
+        abrangencia: abrangencia,
+        areaAtuacao: areaAtuacao
+    })
+    // Faz a requisição AJAX para atualizar os dados no servidor
+    $.ajax({
+        url: "/operadoras-update/",
+        method: "POST",
+        data: {
+            id: operadoraId,
+            nome: nome,
+            administradora: administradora,
+            abrangencia: abrangencia,
+            areaAtuacao: areaAtuacao
+        },
+        success: function () {
+            $("#Message").show().delay(3000).fadeOut();
+            // Atualiza o link com o novo valor
+            $row.find(".link-text").attr("href", areaAtuacao);
+            $row.find(".link-text").text("Abrir Link");
+        },
+        error: function () {
+            $("#MessageError").show().delay(3000).fadeOut();
+        }
+    });
 }
 
+function enableEdit($row) {
+    // Tornar os campos editáveis
+    $row.find(".input").attr("contenteditable", "true").addClass("editable");
+    $row.find(".textarea").attr("contenteditable", "true").addClass("editable");
+
+    // Exibe o botão de editar imagem
+    $row.find(".edit-image-btn").show();
+
+    // Exibe o input de link e oculta o botão "Abrir Link"
+    $row.find(".link-text").hide();
+    $row.find(".link-edit").show();
+
+    // Exibe o select de administradora e oculta o span de texto
+    $row.find(".nome-adm").hide();
+    $row.find(".admin-select").show();
+}
+
+function disableEdit($row) {
+    // Desabilitar os campos de edição
+    $row.find(".input").attr("contenteditable", "false").removeClass("editable");
+    $row.find(".textarea").attr("contenteditable", "false").removeClass("editable");
+
+    // Ocultar o botão de editar imagem
+    $row.find(".edit-image-btn").hide();
+
+    // Voltar ao link "Abrir Link" e esconder o campo de input de link
+    $row.find(".link-text").show();
+    $row.find(".link-edit").hide();
+
+    // Esconde o select de administradora e exibe o span de texto
+    $row.find(".admin-select").hide();
+    $row.find(".nome-adm").show();
+}
+    
 // Evento de clique no botão de editar
 $(document).on('click', '.edit-btn', function () {
-    const row = $(this).closest('tr');
-    var AdmDefault = row.find('.td-3 .nome-adm').text().trim();
-    enableEdit(row, AdmDefault);
+    var $row = $(this).closest(".operadora");
+    var operadoraId = $row.data("id");
+
+    $row.addClass("edit-mode");
+
+    // Chama a função enableEdit passando a linha da operadora
+    enableEdit($row);
+
+    // Mostra os botões de salvar e cancelar
+    $row.find(".edit-btn").hide();
+    $row.find(".save-btn").show();
+    $row.find(".cancel-btn").show();
 });
 
 // Evento de clique do botão cancelar 
 $(document).on('click', '.cancel-btn', function () {
-    var row = $(this).closest('tr');
-    disableEdit(row)
+    var $row = $(this).closest(".operadora");
+
+    $row.removeClass("edit-mode");
+
+    // Chama a função disableEdit passando a linha da operadora
+    disableEdit($row);
+
+    // Esconde os botões de salvar e cancelar, e mostra o de editar
+    $row.find(".edit-btn").show();
+    $row.find(".save-btn").hide();
+    $row.find(".cancel-btn").hide();
 });
 
 // Evento de clique no botão de salvar
 $(document).on('click', '.save-btn', function () {
-    const row = $(this).closest('tr');
-    updateOperadora(row);
+    var $row = $(this).closest(".operadora");
+    var operadoraId = $row.data("id");
+
+    $row.removeClass("edit-mode");
+
+    // Chama a função updateOperadora que envia os dados atualizados para o servidor
+    updateOperadora($row, operadoraId);
+
+    // Desabilita a edição dos campos e altera a exibição dos botões
+    disableEdit($row);
+    $row.find(".edit-btn").show();
+    $row.find(".save-btn").hide();
+    $row.find(".cancel-btn").hide();
 });
 
 $(document).on('click', '.edit-image-btn', function () {
