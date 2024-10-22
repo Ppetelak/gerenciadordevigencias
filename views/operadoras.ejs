@@ -125,37 +125,35 @@
         <!-- Modal de Upload -->
         <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
-                <div class="modal-content" id="modalContent">
-                    <input type="hidden" id="selectedOperadoraId">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="uploadModalLabel">Imagens</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <h3>Imagens existentes:</h3>
-                        <div class="existing-images d-flex flex-wrap">
-                            <% files.forEach(file=> { %>
-                                <div class="image-item">
-                                  <img src="/img/<%= file %>" alt="Imagem" class="existing-image">
-                                </div>
-                              <% }) %>
-                        </div>
-
-                        <form id="uploadForm" enctype="multipart/form-data">
-                            <input type="file" name="file" class="form-control" required>
-                            <br>
-                            <button type="submit" class="btn btn-primary"><i class="bi bi-cloud-upload-fill" title="Enviar nova Logo"></i>Enviar nova Logo</button>
-                        </form>
-
-                        <button class="btn btn-danger" id="deleteBtn" style="display: none;" title="Excluir Imagem Selecionada"><i class="bi bi-trash3"></i>Excluir Imagem Selecionada</button>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Fechar">Fechar</button>
-                        <button type="button" class="btn btn-primary salvar-img-operadora" id="salvar-img-operadora" title="Salvar nova Logo no banco de dados"><i class="bi bi-sd-card"></i>Salvar Nova Logo</button>
-                    </div>
+              <div class="modal-content" id="modalContent">
+                <input type="hidden" id="selectedOperadoraId">
+                <div class="modal-header fixed-top bg-light" style="z-index: 1000;">
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <div class="modal-body" style="margin-top: 80px;">
+                  <div class="fixed-top bg-light p-3" style="top: 20px; z-index: 1000;">
+                    <form id="uploadForm" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
+                      <input type="file" name="file" class="form-control" required>
+                      <button type="submit" class="btn btn-primary"><i class="bi bi-cloud-upload-fill" title="Enviar nova Logo"></i>Enviar nova Logo</button>
+                    </form>
+                    <button class="btn btn-danger mt-2" id="deleteBtn" style="display: none;" title="Excluir Imagem Selecionada"><i class="bi bi-trash3"></i>Excluir Imagem Selecionada</button>
+                  </div>
+                  <h3 class="mt-5">Imagens existentes:</h3>
+                  <div class="existing-images d-flex flex-wrap mt-3">
+                    <% files.forEach(file => { %>
+                      <div class="image-item position-relative m-2">
+                        <img src="/img/<%= file %>" alt="Imagem" class="existing-image" style="cursor: pointer; border: 2px solid transparent;">
+                      </div>
+                    <% }) %>
+                  </div>
+                </div>
+                <div class="modal-footer fixed-bottom bg-light" style="z-index: 1000;">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Fechar">Fechar</button>
+                  <button type="button" class="btn btn-primary salvar-img-operadora" id="salvar-img-operadora" title="Salvar nova Logo no banco de dados"><i class="bi bi-sd-card"></i>Salvar Nova Logo</button>
+                </div>
+              </div>
             </div>
-        </div>
+          </div>
         <script src="/js/operadoras.js"></script>
 </body>
 

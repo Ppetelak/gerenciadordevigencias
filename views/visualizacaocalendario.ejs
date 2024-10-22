@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualização - Publicação Vigências</title>
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
@@ -33,7 +34,7 @@
     <div class="content">
         <div class="row cabecalho">
             <h1>CONFERÊNCIA</h1>
-            <div class="col-3">
+            <div class="col-1">
                 Operadora
             </div>
             <div class="col-3">
@@ -50,8 +51,8 @@
             <% for (let i=0; i < operadoras.length; i++) { %>
                 <% if (operadoras[i].vigencias.length > 0 && operadoras[i].fechamentos.length > 0) { %>
                     <div class="row operadora">
-                        <div class="col-3 img"> 
-                            <img class="img-fluid" src="<%= operadoras[i].logo %>">
+                        <div class="col-1 img"> 
+                            <img  src="<%= operadoras[i].logo %>">
                         </div>
                         <div class="col-9">
                             <% for (let j = 0; j < operadoras[i].vigencias.length; j++) { %>

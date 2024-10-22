@@ -230,7 +230,7 @@ function disableEdit($row) {
     $row.find(".admin-select").hide();
     $row.find(".nome-adm").show();
 }
-    
+
 // Evento de clique no botão de editar
 $(document).on('click', '.edit-btn', function () {
     var $row = $(this).closest(".operadora");
@@ -280,7 +280,7 @@ $(document).on('click', '.save-btn', function () {
 });
 
 $(document).on('click', '.edit-image-btn', function () {
-    const row = $(this).closest('tr');
+    const row = $(this).closest(".operadora")
     const id = row.data('id');
     $('#selectedOperadoraId').val(id);
     openModal();
@@ -383,6 +383,7 @@ document.getElementById('salvar-img-operadora').addEventListener('click', () => 
         const selectedImageSrc = selectedImage.src.replace(window.location.origin, '');
         const operadoraId = document.getElementById('selectedOperadoraId').value;
         closeModal();
+        console.log(selectedImageSrc, operadoraId)
         $.ajax({
             url: '/salvarLogo',
             type: 'POST',
@@ -537,10 +538,14 @@ function getCookieValue(name) {
 }
 
 function showMessage(message) {
-    const Mensagem = document.getElementById('Message')
-    Mensagem.innerHTML = `${decodeURIComponent(message)} 
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>`
-    Mensagem.style.display = 'block';
+    const Mensagem = document.getElementById('Message');
+    if (Mensagem) {
+        Mensagem.innerHTML = `${decodeURIComponent(message)} 
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>`;
+        Mensagem.style.display = 'block';
+    } else {
+        console.error('Elemento de mensagem não encontrado. Certifique-se de que o elemento com o ID "Message" está presente no DOM.');
+    }
 }
 
 function showMessageError(message) {

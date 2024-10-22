@@ -294,3 +294,8 @@ a {
     display: block;
     margin-bottom: 10px;
 }
+
+.selected {
+    border: 2px solid blue;
+    background: #e6f7ff;
+}

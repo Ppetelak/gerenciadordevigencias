@@ -2,6 +2,7 @@ const {
   mysql,
   config
 } = require("./database");
+const logger = require('./logger');
 const express = require('express');
 const app = new express();
 const axios = require('axios');
@@ -66,7 +67,7 @@ app.use(session({
     }
   }));
 
-async function enviarErroDiscord(mensagem) {
+/* async function enviarErroDiscord(mensagem) {
   let enviar = `ERRO VIGÊNCIAS LINHA MASTER: \n
   ${mensagem}`
   try {
@@ -75,7 +76,7 @@ async function enviarErroDiscord(mensagem) {
   } catch (error) {
       console.error('Erro ao enviar mensagem erro:', error);
   }
-}
+} */
 
 
 /* Rota de logout do aplicativo */
@@ -94,39 +95,39 @@ app.get('/logout', (req, res) => {
 /* rotas públicas */
 
 app.get('/login', (req, res) => {
-    const filePath = path.join(__dirname, 'src/index.html');
-    res.sendFile(filePath);
+    //const filePath = path.join(__dirname, 'src/index.html');
+    res.render('index');
 })
 
 /* rotas protegidas */
 
 app.post('/login-verifica', async (req, res) => {
-    const db = await mysql.createPool(config);
-    const { username, password } = req.body;
-    console.log( username, password)
-  
-    const query = 'SELECT * FROM users WHERE nomedesusuario = ?';
-    db.query(query, [username], (err, results) => {
-      if (err) {
-        enviarErroDiscord(err)
-        console.error('Erro ao consultar o banco de dados:', err);
-        return res.status(500).json({ error: 'Erro ao processar a solicitação' });
-      }
-  
-      if (results.length === 0) {
-        return res.status(401).json({ error: 'Usuário não encontrado' });
-      }
-  
-      const user = results[0];
-  
-      if (user.senha !== password) {
-        return res.status(401).json({ error: 'Senha incorreta' });
-      }
-  
-      // Autenticação bem-sucedida, enviar uma resposta de sucesso
-      req.session.usuario = user;
-      res.status(200).json({ message: 'Autenticação bem-sucedida' });
-    });
+  const db = await mysql.createPool(config);
+  const { username, password } = req.body;
+  console.log(username, password);
+
+  const query = 'SELECT * FROM users WHERE nomedesusuario = ?';
+  db.query(query, [username], (err, results) => {
+    if (err) {
+      enviarErroDiscord(err);
+      console.error('Erro ao consultar o banco de dados:', err);
+      return res.status(500).json({ error: 'Erro ao processar a solicitação' });
+    }
+
+    if (results.length === 0) {
+      return res.status(401).json({ error: 'Usuário ou senha incorretos' });
+    }
+
+    const user = results[0];
+
+    if (user.senha !== password) {
+      return res.status(401).json({ error: 'Usuário ou senha incorretos' });
+    }
+
+    // Autenticação bem-sucedida, enviar uma resposta de sucesso
+    req.session.usuario = user;
+    res.status(200).json({ message: 'Autenticação bem-sucedida' });
+  });
 });
 
 app.get('/rotateste', verificaAutenticacao , (req, res) => {
@@ -361,7 +362,6 @@ app.post('/copiar-dados', async (req, res) => {
       }
     });
   } catch (error) {
-    enviarErroDiscord(error)
     console.error(error);
     res.status(500).send('Erro ao carregar os dados.');
   }  
@@ -574,51 +574,68 @@ app.get('/', async (req, res) => {
   });
 });
 
+app.get('/test-error', (req, res) => {
+  throw new Error('Este é um erro de teste para verificar o envio ao Discord.');
+});
 
 app.post('/salvarLogo', async (req, res) => {
   const db = await mysql.createPool(config);
+  const connection = await db.getConnection(); // Obtendo uma conexão
+
   try {
-    const logo = req.body.logoUrl
-    const operadoraId = req.body.operadoraId
+    await connection.beginTransaction(); // Iniciando uma transação
+
+    const logo = req.body.logoUrl;
+    const operadoraId = req.body.operadoraId;
+    
+    if (!logo || !operadoraId) {
+      throw new Error('Dados incompletos: logoUrl ou operadoraId ausente');
+    }
+
     const query = 'UPDATE operadoras SET logo = ? WHERE id = ?';
-    db.query(query, [logo, operadoraId], (err, result) => {
-      if (err) {
-        console.error('Erro ao atualizar operadora:', err);
-  
-        // Reverter a transação em caso de erro
-        db.rollback(() => {
-          console.error('Transação revertida.');
-          return res.status(500).json({ message: 'Erro interno do servidor' });
-        });
-      }
-  
-      // Confirmar a transação
-      db.commit((err) => {
-        if (err) {
-          console.error('Erro ao confirmar a transação:', err);
-  
-          // Reverter a transação em caso de erro
-          db.rollback(() => {
-            console.error('Transação revertida.');
-            return res.status(500).json({ message: 'Erro interno do servidor' });
-          });
-        }
-  
-        res.cookie('alerta', '✅ Logo da operadora atualizado com SUCESSO', { maxAge: 3000 });
-        res.status(200).json({ message: 'Operadora atualizada com sucesso' });
-      });
-    });
+    const result = await connection.query(query, [logo, operadoraId]); // Removendo destructuring para evitar erro de iterabilidade
+
+    await connection.commit(); // Confirmar a transação
+
+    res.cookie('alerta', '✅ Logo da operadora atualizado com SUCESSO', { maxAge: 3000 });
+    res.status(200).json({ message: 'Operadora atualizada com sucesso' });
+
   } catch (error) {
-    enviarErroDiscord(error)
-    console.error(error);
-    res.status(500).send('Erro ao carregar os dados.');
-  }  
+    console.error('Erro durante a atualização:', error);
+    await connection.rollback();
+    res.status(500).json({ message: 'Erro ao processar a solicitação' });
+  } finally {
+    connection.release(); // Liberar a conexão
+  }
 });
+
+
+
 
 /* Inicializando o servidor */
 
 app.listen(process.env.PORT || port, (req, res) =>{
   console.log(`Servidor rodando com sucesso na porta: ${port}`)
 });
+
+// Capturar rejeições não tratadas de promessas
+/* process.on('unhandledRejection', (reason, promise) => {
+  logger.error({
+      message: 'Unhandled Rejection at Promise',
+      reason: reason,
+      stack: reason.stack || reason,
+  });
+});
+
+// Capturar exceções não tratadas
+process.on('uncaughtException', (error) => {
+  logger.error({
+      message: 'Uncaught Exception',
+      stack: error.stack,
+  });
+
+  // Opcional: terminar o processo para evitar um estado inconsistente
+  process.exit(1);
+}); */
 
 

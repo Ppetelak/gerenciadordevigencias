@@ -1,33 +1,35 @@
-console.log('rodou script')
+document.getElementById('login-form').addEventListener('submit', async function(event) {
+    event.preventDefault();
 
-const form = document.querySelector('form');
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+    try {
+        const response = await fetch('/login-verifica', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
+        });
 
-    const username = document.querySelector('#username').value;
-    const password = document.querySelector('#password').value;
+        const result = await response.json();
 
-    console.log(username, password); // Verifique se os valores estão corretos
-
-    const response = await fetch('/login-verifica', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password })
-    });
-
-    const data = await response.json();
-
-    console.log(data); // Verifique a resposta do servidor
-
-    if (response.status === 200) {
-        // Autenticação bem-sucedida, redirecionar para a página de dashboard
-        console.log('Usuário autenticado com sucesso');
-        window.location.href = '/vigencias';
-    } else {
-        // Exibir mensagem de erro
-        console.error(data.error);
+        const errorDiv = document.getElementById('error-message');
+        if (!errorDiv) {
+            const errorMessageDiv = document.createElement('div');
+            errorMessageDiv.id = 'error-message';
+            errorMessageDiv.className = 'alert alert-danger mt-3';
+            document.getElementById('login-form').appendChild(errorMessageDiv);
+        }
+        
+        if (response.ok) {
+            window.location.href = '/vigencias';
+        } else {
+            document.getElementById('error-message').innerText = result.error;
+        }
+    } catch (error) {
+        console.error('Erro ao fazer login:', error);
+        document.getElementById('error-message').innerText = 'Erro ao processar a solicitação.';
     }
 });
