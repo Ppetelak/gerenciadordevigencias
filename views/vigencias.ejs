@@ -80,9 +80,8 @@
                                 </div>
                                 <div class="col-4">
                                   <% 
-                                    // Formate a data/hora no formato AAAA-MM-DDTHH:MM em UTM -3
+                                    // Formate a data/hora no formato AAAA-MM-DDTHH:MM sem ajuste manual de UTC
                                     const movimentacaoDate = new Date(operadoras[i].movimentacao[j]);
-                                    movimentacaoDate.setUTCHours(movimentacaoDate.getUTCHours() - 3);
                                     const movimentacaoFormatted = movimentacaoDate.toISOString().slice(0, 16);
                                   %>
                                   <input 
@@ -94,9 +93,8 @@
                                 </div>
                                 <div class="col-4">
                                   <% 
-                                    // Formate a data/hora no formato AAAA-MM-DDTHH:MM em UTM -3
+                                    // Formate a data/hora no formato AAAA-MM-DDTHH:MM sem ajuste manual de UTC
                                     const fechamentoDate = new Date(operadoras[i].fechamentos[j]);
-                                    fechamentoDate.setUTCHours(fechamentoDate.getUTCHours() - 3);
                                     const fechamentoFormatted = fechamentoDate.toISOString().slice(0, 16);
                                   %>
                                   <input 

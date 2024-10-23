@@ -67,16 +67,11 @@ app.use(session({
     }
   }));
 
-/* async function enviarErroDiscord(mensagem) {
-  let enviar = `ERRO VIGÊNCIAS LINHA MASTER: \n
-  ${mensagem}`
-  try {
-    await axios.post('https://bot.midiaideal.com/mensagem-erros', { enviar });
-    console.log('Mensagem enviada com sucesso');
-  } catch (error) {
-      console.error('Erro ao enviar mensagem erro:', error);
-  }
-} */
+async function enviarErroDiscord(mensagem) {
+  logger.error({
+    message: mensagem
+  })
+}
 
 
 /* Rota de logout do aplicativo */
@@ -619,7 +614,7 @@ app.listen(process.env.PORT || port, (req, res) =>{
 });
 
 // Capturar rejeições não tratadas de promessas
-/* process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason, promise) => {
   logger.error({
       message: 'Unhandled Rejection at Promise',
       reason: reason,
@@ -636,6 +631,6 @@ process.on('uncaughtException', (error) => {
 
   // Opcional: terminar o processo para evitar um estado inconsistente
   process.exit(1);
-}); */
+});
 
 
